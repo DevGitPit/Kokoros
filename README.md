@@ -1,3 +1,11 @@
+# 📱 Kokoros for Android (Termux Fork)
+
+> **Note:** This is a fork of Kokoros optimized for running on Android via Termux with a helper Chrome Extension.
+>
+> **👉 [Click here for Android Installation & Extension Instructions](ANDROID_SETUP.md)**
+
+---
+(Original Readme starts below...)
 <div align="center">
   <img src="https://img2023.cnblogs.com/blog/3572323/202501/3572323-20250112184100378-907988670.jpg" alt="Banner" width="400" height="190">
 </div>
