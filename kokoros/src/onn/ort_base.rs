@@ -18,6 +18,14 @@ pub trait OrtBase {
                 let session = builder
                     .with_execution_providers(providers)
                     .map_err(|e| format!("Failed to build session: {}", e))?
+                    // Force specific thread count to avoid slow efficiency cores.
+                    // Set '5' for 1 Prime + 4 performance coress (e.g., SD 7+ Gen 3).
+                    // Set '4' for standard 4-big-core setups.
+                    .with_intra_threads(5)
+                    .map_err(|e| format!("Failed to set threads: {}", e))?
+                    // Optional: Ensure max optimization level
+                    .with_optimization_level(ort::session::builder::GraphOptimizationLevel::Level3)
+                    .map_err(|e| format!("Failed to set opt level: {}", e))?
                     .with_log_level(LogLevel::Warning)
                     .map_err(|e| format!("Failed to set log level: {}", e))?
                     .commit_from_file(model_path)

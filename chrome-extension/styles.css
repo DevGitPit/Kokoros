@@ -1,0 +1,141 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 350px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+h1 {
+    font-size: 1.4em;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Text Container */
+#text-container {
+    background-color: white;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+#text-input {
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 150px;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden; /* Prevent side scroll */
+    padding: 10px;
+    outline: none;
+    white-space: pre-wrap; /* Wrap text */
+    word-wrap: break-word; /* Break long words */
+    word-break: break-word;
+}
+
+/* Highlight style */
+.highlight {
+    background-color: #fff3cd;
+    border-bottom: 2px solid #ffc107;
+    border-radius: 2px;
+    transition: background-color 0.2s;
+}
+
+/* Controls */
+.control-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+label {
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #495057;
+    min-width: 45px;
+}
+
+select, input[type="number"] {
+    padding: 6px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+select {
+    flex-grow: 1;
+}
+
+input[type="range"] {
+    flex-grow: 1;
+    cursor: pointer;
+}
+
+#speed-value {
+    font-weight: 600;
+    color: #007bff;
+    width: 30px;
+    text-align: right;
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+button {
+    background-color: #0d6efd;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95em;
+    flex: 1;
+    font-weight: 500;
+    transition: background-color 0.15s;
+}
+
+button:hover:not(:disabled) {
+    background-color: #0b5ed7;
+}
+
+button:disabled {
+    background-color: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed;
+}
+
+#stop-button {
+    background-color: #dc3545;
+    flex: 0 0 auto;
+    width: 80px;
+}
+
+#stop-button:hover:not(:disabled) {
+    background-color: #bb2d3b;
+}
+
+#status-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #e2e3e5;
+    color: #383d41;
+    font-size: 0.85em;
+    text-align: center;
+}
+
+audio {
+    width: 100%;
+    margin-top: 10px;
+    display: none; /* Hide default player when using custom controls mostly */
+}

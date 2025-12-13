@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Kokoro Local TTS",
+  "version": "1.0",
+  "description": "Read text aloud using local Kokoro TTS server.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Speak with Kokoro"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
