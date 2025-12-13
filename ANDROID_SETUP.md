@@ -130,7 +130,7 @@ To use this with Quetta browser or others:
 
 **Basic CLI Test:**
 ```bash
-./target/release/koko --style af_heart "Hello world" -o test.wav
+./target/release/koko --style af_heart t "Hello world" -o test.wav
 mpv test.wav
 ```
 
