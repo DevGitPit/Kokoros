@@ -1,62 +1,86 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // UI Elements
+    // --- UI Elements ---
     const textInputEl = document.getElementById('text-input');
     const voiceSelectEl = document.getElementById('voice-select');
+    const refreshBtn = document.getElementById('refresh-connection');
     const speedInputEl = document.getElementById('speed-input');
     const speedValueEl = document.getElementById('speed-value');
     const bufferInputEl = document.getElementById('buffer-input');
-    const speakButton = document.getElementById('speak-button');
+    
     const streamButton = document.getElementById('stream-button');
     const stopButton = document.getElementById('stop-button');
     const statusMessageEl = document.getElementById('status-message');
-    const audioPlayer = document.getElementById('audio-player');
-    const notificationSound = document.getElementById('notification-sound');
-
+    
     const LOCAL_SERVER_URL = 'http://localhost:3000';
-    
-    // State
-    let audioContext = null;
-    let streamAbortController = null;
     let sentences = [];
-    let currentSentenceIndex = 0;
-    
-    // Flags
-    let isPlaying = false;
-    let isPaused = false;
-    let isStreaming = false;
-    
-    // Queue State
-    let audioQueue = [];
-    let nextStartTime = 0;
-    
-    // --- Utility Functions ---
+    let originalRawText = null; // Store clean text source of truth
+
+    // --- Helpers ---
     function setStatus(message, isError = false) {
         statusMessageEl.textContent = message;
-        statusMessageEl.style.color = isError ? 'red' : (isError === false ? 'green' : '#495057');
+        statusMessageEl.style.color = isError ? '#d32f2f' : '#333';
     }
 
-    function disableControls(disable) {
-        speakButton.disabled = disable;
-        // streamButton should be enabled if we are paused to allow resume
-        streamButton.disabled = disable && !isPaused; 
-        voiceSelectEl.disabled = disable;
-        speedInputEl.disabled = disable;
-        textInputEl.contentEditable = !disable;
-        bufferInputEl.disabled = disable;
+    function setAppMode(state) {
+        const isOffline = state === 'offline';
+        const isPlaying = state === 'playing';
+
+        if (isOffline) {
+            voiceSelectEl.disabled = true;
+        } else {
+            voiceSelectEl.disabled = isPlaying;
+        }
+
+        speedInputEl.disabled = isOffline || isPlaying;
+        bufferInputEl.disabled = isOffline || isPlaying;
+        
+        // Stream button behaves differently: It is enabled if Paused to allow Resume
+        streamButton.disabled = isOffline || isPlaying; 
+        
+        stopButton.disabled = !isPlaying;
+        textInputEl.contentEditable = !isPlaying;
     }
 
-    function splitIntoSentences(text) {
-        if (!text) return [];
-        const segmenter = new Intl.Segmenter('en', { granularity: 'sentence' });
-        const segments = segmenter.segment(text);
-        return Array.from(segments)
-            .map(s => s.segment.replace(/\r\n/g, ' ').replace(/\n/g, ' ').trim())
-            .filter(s => s.length > 0);
+    // Invalidate originalRawText on user edit
+    textInputEl.addEventListener('input', () => {
+        originalRawText = null;
+        sentences = [];
+    });
+
+    async function checkServerAndFetchVoices() {
+        const originalBtnText = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '<span class="spinning">&#x21bb;</span>';
+        try {
+            const res = await fetch(`${LOCAL_SERVER_URL}/v1/audio/voices`);
+            if (!res.ok) throw new Error('Failed');
+            const data = await res.json();
+            
+            const currentSelection = voiceSelectEl.value;
+            voiceSelectEl.innerHTML = '';
+            data.voices.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v;
+                opt.textContent = v;
+                voiceSelectEl.appendChild(opt);
+            });
+            
+            if (data.voices.includes(currentSelection)) voiceSelectEl.value = currentSelection;
+            else if (data.voices.includes('af_sky')) voiceSelectEl.value = 'af_sky';
+            
+            setAppMode('ready');
+            setStatus("Connected.");
+        } catch (e) {
+            setAppMode('offline');
+            setStatus("Server offline. Edit text, then click Refresh ↻", true);
+        } finally {
+            refreshBtn.innerHTML = originalBtnText;
+        }
     }
 
+    // --- Highlighting ---
     function highlightSentence(index) {
         if (index < 0 || index >= sentences.length) return;
-        
+
         const fragment = document.createDocumentFragment();
         sentences.forEach((sentence, i) => {
             const span = document.createElement('span');
@@ -67,387 +91,111 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             fragment.appendChild(span);
         });
-        
+
         textInputEl.innerHTML = '';
         textInputEl.appendChild(fragment);
 
-        const el = document.getElementById('current-active-sentence');
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const activeSpan = document.getElementById('current-active-sentence');
+        if (activeSpan) {
+            activeSpan.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
         }
     }
 
-    // --- Audio Context Helpers ---
-    function initAudioContext() {
-        const AudioCtor = window.AudioContext || window.webkitAudioContext;
-        if (!audioContext || audioContext.state === 'closed') {
-            audioContext = new AudioCtor({ sampleRate: 24000 });
+    function splitIntoSentences(text) {
+        if (!text) return [];
+        // Pre-process: Replace newlines with spaces to ensure separation
+        const cleanText = text.replace(/[\r\n]+/g, ' ');
+
+        if ('Segmenter' in Intl) {
+            const segmenter = new Intl.Segmenter('en', { granularity: 'sentence' });
+            return Array.from(segmenter.segment(cleanText)).map(s => s.segment.trim()).filter(s => s.length > 0);
         }
-        if (audioContext.state === 'suspended') {
-            audioContext.resume();
-        }
+        return cleanText.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
     }
 
-    function playNotification() {
-        if (notificationSound) {
-            notificationSound.play().catch(() => {});
-        }
-    }
-
-    // --- Stop/Reset ---
-    async function stopAll(resetIndex = false) {
-        if (streamAbortController) {
-            streamAbortController.abort();
-            streamAbortController = null;
-        }
-        
-        if (audioContext) {
-            try { await audioContext.close(); } catch(e){}
-            audioContext = null;
-        }
-
-        audioPlayer.pause();
-        
-        // Don't clear src immediately if we are just pausing Full mode
-        // But for consistency with "Stop" button, we usually clear.
-        if (resetIndex) {
-            audioPlayer.src = '';
-            audioPlayer.currentTime = 0;
-            currentSentenceIndex = 0;
-            // Clear highlight?
-            textInputEl.textContent = sentences.length > 0 ? sentences.join(' ') : textInputEl.textContent;
-            setStatus('Stopped.');
-        } else {
-             // Paused state
-             setStatus('Paused.');
-        }
-
-        isPlaying = false;
-        isPaused = !resetIndex; // If not resetting index, we are paused
-        isStreaming = false;
-        audioQueue = [];
-        
-        disableControls(false);
-        stopButton.disabled = true;
-        
-        // Update Button Text to reflect state
-        streamButton.textContent = isPaused ? 'Resume Stream' : 'Stream';
-        
-        updateMediaSession(isPaused ? 'paused' : 'none');
-    }
-
-    // --- Media Session ---
-    function updateMediaSession(state) {
-        if (!('mediaSession' in navigator)) return;
-        navigator.mediaSession.playbackState = state;
-        
-        if (state === 'playing' || state === 'paused') {
-            navigator.mediaSession.metadata = new MediaMetadata({
-                title: 'Kokoro Reader',
-                artist: 'Local TTS',
-                album: isStreaming ? `Sentence ${currentSentenceIndex + 1}/${sentences.length}` : 'Full Audio',
-                artwork: [{ src: 'icons/icon128.png', sizes: '128x128', type: 'image/png' }]
-            });
-        }
-    }
-
-    function setupMediaSession() {
-        if (!('mediaSession' in navigator)) return;
-
-        navigator.mediaSession.setActionHandler('play', () => {
-             if (isPaused && isStreaming) {
-                 speakStream(true); 
-             } else if (audioPlayer.src) {
-                 audioPlayer.play();
-             }
-        });
-        navigator.mediaSession.setActionHandler('pause', () => {
-            if (isStreaming) {
-                stopAll(false);
+    // --- Message Listener ---
+    chrome.runtime.onMessage.addListener((msg) => {
+        if (msg.type === 'UPDATE_PROGRESS') {
+            highlightSentence(msg.index);
+        } 
+        else if (msg.type === 'PLAYBACK_FINISHED') {
+            setAppMode('ready');
+            // Restore clean original text (removes spans)
+            if (originalRawText) {
+                textInputEl.innerText = originalRawText;
             } else {
-                audioPlayer.pause();
+                textInputEl.textContent = sentences.length > 0 ? sentences.join(' ') : textInputEl.textContent;
             }
-        });
-        navigator.mediaSession.setActionHandler('stop', () => stopAll(true));
-        navigator.mediaSession.setActionHandler('seekto', (details) => {
-             if (!isStreaming && audioPlayer.src) {
-                 audioPlayer.currentTime = details.seekTime;
-             }
-        });
-        navigator.mediaSession.setActionHandler('previoustrack', () => {
-             if (isStreaming || (isPaused && sentences.length > 0)) {
-                 stopAll(false);
-                 currentSentenceIndex = Math.max(0, currentSentenceIndex - 1);
-                 speakStream(true);
-             }
-        });
-        navigator.mediaSession.setActionHandler('nexttrack', () => {
-            if (isStreaming || (isPaused && sentences.length > 0)) {
-                 stopAll(false);
-                 currentSentenceIndex++;
-                 speakStream(true);
-            }
-        });
-    }
+            setStatus('Finished / Paused.');
+            streamButton.textContent = "Resume Stream"; // Update button text
+        } 
+        else if (msg.type === 'ERROR') {
+            setAppMode('ready');
+            setStatus('Error: ' + msg.message, true);
+        }
+    });
 
-    // --- Speak Full ---
-    async function speakFull() {
-        const text = textInputEl.innerText;
-        const voice = voiceSelectEl.value;
-        const speed = parseFloat(speedInputEl.value);
-
-        if (!text.trim()) { setStatus('No text.', true); return; }
-
-        // Reset state
-        await stopAll(true);
-        disableControls(true);
-        stopButton.disabled = false;
+    // --- Button Actions ---
+    streamButton.addEventListener('click', () => {
+        // If we don't have a clean source of truth, capture it now
+        if (originalRawText === null) {
+            originalRawText = textInputEl.innerText;
+        }
         
-        setStatus('Generating full audio... (Please wait)');
-        updateMediaSession('playing');
+        if (!originalRawText.trim()) return setStatus('No text.', true);
+        
+        // Always refresh sentences from source of truth
+        sentences = splitIntoSentences(originalRawText); 
 
+        setAppMode('playing');
+        setStatus('Buffering...');
+
+        chrome.runtime.sendMessage({
+            type: 'CMD_START_STREAM',
+            payload: {
+                text: originalRawText, // Send clean text
+                voice: voiceSelectEl.value,
+                speed: parseFloat(speedInputEl.value),
+                bufferTarget: parseInt(bufferInputEl.value) || 2
+            }
+        });
+    });
+
+    stopButton.addEventListener('click', () => {
+        chrome.runtime.sendMessage({ type: 'CMD_STOP' });
+    });
+    
+    refreshBtn.addEventListener('click', () => checkServerAndFetchVoices());
+    speedInputEl.addEventListener('input', () => speedValueEl.textContent = speedInputEl.value);
+
+    // --- Init ---
+    async function init() {
+        // Diagnostic: Check for Offscreen support
         try {
-            const response = await fetch(`${LOCAL_SERVER_URL}/v1/audio/speech`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'tts-1',
-                    input: text,
-                    voice: voice,
-                    speed: speed,
-                    stream: false,
-                    response_format: 'mp3'
-                })
-            });
-
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                audioPlayer.src = url;
-                audioPlayer.style.display = 'block'; // Ensure controls are visible
-                audioPlayer.play().catch(e => console.error("Play failed", e));
-                setStatus('Playing full audio.');
-                
-                audioPlayer.onended = () => {
-                    playNotification();
-                    stopAll(true);
-                };
-            } else {
-                setStatus('Server error.', true);
-                stopAll(true);
+            const contexts = await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] });
+            console.log('Offscreen contexts:', contexts);
+            if (contexts.length === 0) {
+                console.warn('⚠️ No offscreen document found! Background audio might fail on this browser.');
             }
         } catch (e) {
-            setStatus('Network error.', true);
-            stopAll(true);
-        }
-    }
-
-    // --- Speak Stream ---
-    async function speakStream(resume = false) {
-        const text = textInputEl.innerText;
-        const voice = voiceSelectEl.value;
-        const speed = parseFloat(speedInputEl.value);
-        const bufferTarget = Math.max(1, parseInt(bufferInputEl.value) || 2);
-
-        // Logic fix: correctly handle resume
-        if (!resume) {
-            sentences = splitIntoSentences(text);
-            currentSentenceIndex = 0;
-        } else {
-            // Resume: Start from context logic
-            // If we paused at index 5, start at 4 to give context?
-            currentSentenceIndex = Math.max(0, currentSentenceIndex - 1);
+            console.warn('⚠️ Failed to query offscreen contexts (Browser too old?):', e);
         }
 
-        if (sentences.length === 0 || currentSentenceIndex >= sentences.length) {
-            setStatus('Finished / No text.');
-            return;
-        }
-
-        if (audioContext) await audioContext.close();
-        
-        isStreaming = true;
-        isPlaying = true;
-        isPaused = false;
-        audioQueue = [];
-        
-        disableControls(true);
-        stopButton.disabled = false;
-        streamButton.textContent = 'Stream'; // Reset text
-        
-        initAudioContext();
-        nextStartTime = audioContext.currentTime + 0.1;
-        
-        streamAbortController = new AbortController();
-        const signal = streamAbortController.signal;
-
-        setStatus(`Streaming...`);
-        updateMediaSession('playing');
-        highlightSentence(currentSentenceIndex);
-
-        let fetchIndex = currentSentenceIndex;
-        let playIndex = currentSentenceIndex;
-        let isFetching = false;
-        
-        const checkLoop = async () => {
-            if (signal.aborted) return;
-            
-            // 1. Play
-            while (audioQueue.length > 0) {
-                const item = audioQueue.shift();
-                scheduleBuffer(item);
-                playIndex++;
-            }
-
-            // 2. Fetch
-            const inFlightOrBuffered = fetchIndex - playIndex;
-            if (!isFetching && inFlightOrBuffered < bufferTarget && fetchIndex < sentences.length) {
-                isFetching = true;
-                const indexToFetch = fetchIndex;
-                fetchIndex++;
-                
-                fetchSentence(sentences[indexToFetch], voice, speed, signal)
-                    .then(buffer => {
-                        if (signal.aborted) return;
-                        if (buffer) {
-                            audioQueue.push({ buffer, index: indexToFetch });
-                        }
-                    })
-                    .finally(() => {
-                        isFetching = false;
-                        checkLoop();
-                    });
-            }
-
-            // 3. Complete
-            if (playIndex >= sentences.length && !isFetching && audioQueue.length === 0) {
-                if (audioContext && audioContext.currentTime > nextStartTime) {
-                    playNotification();
-                    stopAll(true);
-                    setStatus('Finished.');
-                    return;
-                }
-            }
-
-            if (isStreaming) setTimeout(checkLoop, 100);
-        };
-
-        checkLoop();
-    }
-
-    async function fetchSentence(text, voice, speed, signal) {
-        try {
-            const res = await fetch(`${LOCAL_SERVER_URL}/v1/audio/speech`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'tts-1',
-                    input: text,
-                    voice: voice,
-                    speed: speed,
-                    stream: false,
-                    response_format: 'mp3'
-                }),
-                signal: signal
-            });
-            if (!res.ok) throw new Error('Err');
-            const ab = await res.arrayBuffer();
-            return await audioContext.decodeAudioData(ab);
-        } catch (e) { return null; }
-    }
-
-    function scheduleBuffer(item) {
-        if (!audioContext) return;
-        const source = audioContext.createBufferSource();
-        source.buffer = item.buffer;
-        source.connect(audioContext.destination);
-        
-        const startTime = Math.max(audioContext.currentTime, nextStartTime);
-        source.start(startTime);
-        nextStartTime = startTime + item.buffer.duration;
-        
-        const delay = (startTime - audioContext.currentTime) * 1000;
-        setTimeout(() => {
-            if (isStreaming && !isPaused) {
-                highlightSentence(item.index);
-                currentSentenceIndex = item.index;
-                // Update notification for lock screen
-                if ('mediaSession' in navigator) {
-                     navigator.mediaSession.metadata.album = `Sentence ${item.index + 1}/${sentences.length}`;
-                }
-            }
-        }, delay);
-    }
-
-    async function init() {
-        const text = await getSelectedText();
-        if (text) textInputEl.innerText = text;
-        await fetchVoices();
-        setupMediaSession();
-        stopButton.disabled = true;
-    }
-
-    async function getSelectedText() {
-        try {
-            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-            if (!tab) return '';
+        // Get Text
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab && !tab.url.startsWith('chrome://')) {
             const res = await chrome.scripting.executeScript({
                 target: { tabId: tab.id },
                 function: () => {
                     const s = window.getSelection().toString();
-                    return s || document.body.innerText;
+                    return s || document.body.innerText.substring(0, 100000); 
                 }
             });
-            return res[0]?.result?.substring(0, 50000) || '';
-        } catch { return ''; }
-    }
-
-    async function fetchVoices() {
-        try {
-            const res = await fetch(`${LOCAL_SERVER_URL}/v1/audio/voices`);
-            const data = await res.json();
-            voiceSelectEl.innerHTML = '';
-            data.voices.forEach(v => {
-                const opt = document.createElement('option');
-                opt.value = v;
-                opt.textContent = v;
-                voiceSelectEl.appendChild(opt);
-            });
-            if (data.voices.includes('af_sky')) voiceSelectEl.value = 'af_sky';
-        } catch (e) {}
-    }
-
-    // --- Button Handlers ---
-    speakButton.addEventListener('click', speakFull);
-    
-    // Correct Resume Logic
-    streamButton.addEventListener('click', () => {
-        if (isPaused) {
-            speakStream(true); // Resume
-        } else {
-            speakStream(false); // New Start
+            if (res[0]?.result) textInputEl.innerText = res[0].result;
+            else textInputEl.innerText = "No text found. Paste here.";
         }
-    });
-    
-    stopButton.addEventListener('click', () => {
-        if (isStreaming) {
-             stopAll(false); // Pause
-        } else {
-             stopAll(true); // Stop Full
-        }
-    });
-
-    speedInputEl.addEventListener('input', () => speedValueEl.textContent = speedInputEl.value);
-
-    // Audio Element Event
-    audioPlayer.addEventListener('play', () => {
-        updateMediaSession('playing');
-        setStatus('Playing full audio.');
-    });
-    audioPlayer.addEventListener('pause', () => {
-        updateMediaSession('paused');
-        setStatus('Paused.');
-    });
-
+        
+        await checkServerAndFetchVoices();
+    }
     init();
 });

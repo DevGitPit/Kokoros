@@ -25,13 +25,14 @@ h1 {
 
 #text-input {
     font-family: inherit;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.6;
     min-height: 150px;
-    max-height: 300px;
+    max-height: 450px; /* Increased max-height */
     overflow-y: auto;
     overflow-x: hidden; /* Prevent side scroll */
     padding: 10px;
+    padding-bottom: 25px; /* Extra padding at bottom */
     outline: none;
     white-space: pre-wrap; /* Wrap text */
     word-wrap: break-word; /* Break long words */
