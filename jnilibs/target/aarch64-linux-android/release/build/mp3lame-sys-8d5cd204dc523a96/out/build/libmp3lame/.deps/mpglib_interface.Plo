@@ -1,0 +1,4 @@
+mpglib_interface.lo: \
+  /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/mpglib_interface.c \
+  ../config.h
+../config.h:

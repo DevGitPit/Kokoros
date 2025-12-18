@@ -1,0 +1,17 @@
+# This file is used to suppress Android Studio's default behavior of showing
+# certain files in the Project pane.
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/app/build
+*.iml
+.cxx/
+*.apk
+*.aab
+*.aar
+# Android native build output
+*.so
+.ndk/
+

@@ -1,0 +1,484 @@
+running: cd "/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build" && CC="aarch64-linux-android-gcc" CFLAGS="-O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS" CXX="aarch64-linux-android-g++" CXXFLAGS="-O3 -DANDROID -ffunction-sections -fdata-sections -fPIC" LC_ALL="C" "sh" "-c" "exec \"$0\" \"$@\"" "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/configure" "--prefix=/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out" "--disable-shared" "--enable-static" "--disable-decoder" "--host=aarch64-linux-android" "--disable-rpath" "--disable-frontend" "--disable-gtktest" "--with-pic"
+checking build system type... aarch64-unknown-linux-android
+checking host system type... aarch64-unknown-linux-android
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for aarch64-linux-android-strip... aarch64-linux-android-strip
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for style of include used by make... GNU
+checking for aarch64-linux-android-gcc... aarch64-linux-android-gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether aarch64-linux-android-gcc accepts -g... yes
+checking for aarch64-linux-android-gcc option to accept ISO C89... none needed
+checking whether aarch64-linux-android-gcc understands -c and -o together... yes
+checking dependency style of aarch64-linux-android-gcc... gcc3
+checking how to run the C preprocessor... aarch64-linux-android-gcc -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking for library containing strerror... none required
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by aarch64-linux-android-gcc... /data/data/com.termux/files/usr/bin/ld
+checking if the linker (/data/data/com.termux/files/usr/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /data/data/com.termux/files/usr/bin/aarch64-linux-android-nm -B
+checking the name lister (/data/data/com.termux/files/usr/bin/aarch64-linux-android-nm -B) interface... BSD nm
+checking whether ln -s works... yes
+checking the maximum length of command line arguments... 1572864
+checking how to convert aarch64-unknown-linux-android file names to aarch64-unknown-linux-android format... func_convert_file_noop
+checking how to convert aarch64-unknown-linux-android file names to toolchain format... func_convert_file_noop
+checking for /data/data/com.termux/files/usr/bin/ld option to reload object files... -r
+checking for aarch64-linux-android-objdump... aarch64-linux-android-objdump
+checking how to recognize dependent libraries... pass_all
+checking for aarch64-linux-android-dlltool... no
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for aarch64-linux-android-ar... aarch64-linux-android-ar
+checking for archiver @FILE support... @
+checking for aarch64-linux-android-strip... (cached) aarch64-linux-android-strip
+checking for aarch64-linux-android-ranlib... aarch64-linux-android-ranlib
+checking command to parse /data/data/com.termux/files/usr/bin/aarch64-linux-android-nm -B output from aarch64-linux-android-gcc object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for aarch64-linux-android-mt... no
+checking for mt... no
+checking if : is a manifest tool... no
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if aarch64-linux-android-gcc supports -fno-rtti -fno-exceptions... yes
+checking for aarch64-linux-android-gcc option to produce PIC... -fPIC -DPIC
+checking if aarch64-linux-android-gcc PIC flag -fPIC -DPIC works... yes
+checking if aarch64-linux-android-gcc static flag -static works... no
+checking if aarch64-linux-android-gcc supports -c -o file.o... yes
+checking if aarch64-linux-android-gcc supports -c -o file.o... (cached) yes
+checking whether the aarch64-linux-android-gcc linker (/data/data/com.termux/files/usr/bin/ld) supports shared libraries... yes
+checking dynamic linker characteristics... Android linker
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... no
+checking whether to build static libraries... yes
+checking for aarch64-linux-android-gcc... (cached) aarch64-linux-android-gcc
+checking whether we are using the GNU C compiler... (cached) yes
+checking whether aarch64-linux-android-gcc accepts -g... (cached) yes
+checking for aarch64-linux-android-gcc option to accept ISO C89... (cached) none needed
+checking whether aarch64-linux-android-gcc understands -c and -o together... (cached) yes
+checking dependency style of aarch64-linux-android-gcc... (cached) gcc3
+checking compiler... clang
+checking version of clang... 21.1.7
+checking dmalloc.h usability... no
+checking dmalloc.h presence... no
+checking for dmalloc.h... no
+checking for ANSI C header files... (cached) yes
+checking errno.h usability... yes
+checking errno.h presence... yes
+checking for errno.h... yes
+checking fcntl.h usability... yes
+checking fcntl.h presence... yes
+checking for fcntl.h... yes
+checking limits.h usability... yes
+checking limits.h presence... yes
+checking for limits.h... yes
+checking for stdint.h... (cached) yes
+checking for string.h... (cached) yes
+checking sys/soundcard.h usability... no
+checking sys/soundcard.h presence... no
+checking for sys/soundcard.h... no
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking for unistd.h... (cached) yes
+checking linux/soundcard.h usability... yes
+checking linux/soundcard.h presence... yes
+checking for linux/soundcard.h... yes
+checking working SSE intrinsics... no
+checking for an ANSI C-conforming const... yes
+checking for inline... inline
+checking whether byte ordering is bigendian... no
+checking for special C compiler options needed for large files... no
+checking for _FILE_OFFSET_BITS value needed for large files... no
+checking size of short... 2
+checking size of unsigned short... 2
+checking size of int... 4
+checking size of unsigned int... 4
+checking size of long... 8
+checking size of unsigned long... 8
+checking size of long long... 8
+checking size of unsigned long long... 8
+checking size of float... 4
+checking size of double... 8
+checking for long double with more range or precision than double... yes
+checking for uint8_t... yes
+checking for int8_t... yes
+checking for uint16_t... yes
+checking for int16_t... yes
+checking for uint32_t... yes
+checking for int32_t... yes
+checking for uint64_t... yes
+checking for int64_t... yes
+checking for IEEE854 compliant 80 bit floats... yes
+checking for ieee854_float80_t... no
+checking for ieee754_float64_t... no
+checking for ieee754_float32_t... no
+checking for size_t... yes
+checking whether time.h and sys/time.h may both be included... yes
+checking for working alloca.h... yes
+checking for alloca... yes
+checking for gettimeofday... yes
+checking for strtol... yes
+checking for socket... yes
+checking termcap.h usability... yes
+checking termcap.h presence... yes
+checking for termcap.h... yes
+checking ncurses/termcap.h usability... yes
+checking ncurses/termcap.h presence... yes
+checking for ncurses/termcap.h... yes
+checking for initscr in -ltermcap... yes
+checking for initscr in -lcurses... yes
+checking for initscr in -lncurses... yes
+checking for ld used by aarch64-linux-android-gcc... /data/data/com.termux/files/usr/bin/ld
+checking if the linker (/data/data/com.termux/files/usr/bin/ld) is GNU ld... yes
+checking for shared library run path origin... done
+checking for iconv... yes
+checking for working iconv... yes
+checking how to link with libiconv... -liconv
+checking for iconv declaration... 
+         extern size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);
+checking for cos in -lm... yes
+checking for cos in -lffm... no
+checking for cos in -lcpml... no
+checking for gtk-config... no
+checking for GTK - version >= 1.2.0... no
+*** The gtk-config script installed by GTK could not be found
+*** If GTK was installed in PREFIX, make sure PREFIX/bin is in
+*** your path, or set the GTK_CONFIG environment variable to the
+*** full path to gtk-config.
+checking use of ElectricFence malloc debugging... no
+checking use of file io... lame
+checking use of analyzer hooks... yes
+checking use of mpg123 decoder... no
+checking if the lame frontend should be build... no
+checking if mp3x is requested... no
+checking if mp3rtp is requested... no
+checking if dynamic linking of the frontends is requested... no
+checking for termcap... yes
+checking if I have to build the internal vector lib... no
+checking for nasm... no
+checking for additional optimizations... no
+checking for debug options... no
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating libmp3lame/Makefile
+config.status: creating libmp3lame/i386/Makefile
+config.status: creating libmp3lame/vector/Makefile
+config.status: creating frontend/Makefile
+config.status: creating mpglib/Makefile
+config.status: creating doc/Makefile
+config.status: creating doc/html/Makefile
+config.status: creating doc/man/Makefile
+config.status: creating include/Makefile
+config.status: creating Dll/Makefile
+config.status: creating misc/Makefile
+config.status: creating dshow/Makefile
+config.status: creating ACM/Makefile
+config.status: creating ACM/ADbg/Makefile
+config.status: creating ACM/ddk/Makefile
+config.status: creating ACM/tinyxml/Makefile
+config.status: creating lame.spec
+config.status: creating mac/Makefile
+config.status: creating macosx/Makefile
+config.status: creating macosx/English.lproj/Makefile
+config.status: creating macosx/LAME.xcodeproj/Makefile
+config.status: creating vc_solution/Makefile
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+running: cd "/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build" && MAKEFLAGS="-j --jobserver-fds=9,11 --jobserver-auth=9,11" "sh" "-c" "exec \"$0\" \"$@\"" "make" "install" "-j8"
+Making install in mpglib
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/mpglib'
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT common.lo -MD -MP -MF .deps/common.Tpo -c -o common.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/common.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT dct64_i386.lo -MD -MP -MF .deps/dct64_i386.Tpo -c -o dct64_i386.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/dct64_i386.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT decode_i386.lo -MD -MP -MF .deps/decode_i386.Tpo -c -o decode_i386.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/decode_i386.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT interface.lo -MD -MP -MF .deps/interface.Tpo -c -o interface.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/interface.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT layer1.lo -MD -MP -MF .deps/layer1.Tpo -c -o layer1.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/layer1.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT layer2.lo -MD -MP -MF .deps/layer2.Tpo -c -o layer2.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/layer2.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT layer3.lo -MD -MP -MF .deps/layer3.Tpo -c -o layer3.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/layer3.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT tabinit.lo -MD -MP -MF .deps/tabinit.Tpo -c -o tabinit.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/tabinit.c
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT decode_i386.lo -MD -MP -MF .deps/decode_i386.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/decode_i386.c  -fPIC -DPIC -o decode_i386.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT layer1.lo -MD -MP -MF .deps/layer1.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/layer1.c  -fPIC -DPIC -o layer1.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT common.lo -MD -MP -MF .deps/common.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/common.c  -fPIC -DPIC -o common.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT layer3.lo -MD -MP -MF .deps/layer3.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/layer3.c  -fPIC -DPIC -o layer3.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT interface.lo -MD -MP -MF .deps/interface.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/interface.c  -fPIC -DPIC -o interface.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT dct64_i386.lo -MD -MP -MF .deps/dct64_i386.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/dct64_i386.c  -fPIC -DPIC -o dct64_i386.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT tabinit.lo -MD -MP -MF .deps/tabinit.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/tabinit.c  -fPIC -DPIC -o tabinit.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT layer2.lo -MD -MP -MF .deps/layer2.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib/layer2.c  -fPIC -DPIC -o layer2.o
+mv -f .deps/common.Tpo .deps/common.Plo
+mv -f .deps/decode_i386.Tpo .deps/decode_i386.Plo
+mv -f .deps/dct64_i386.Tpo .deps/dct64_i386.Plo
+mv -f .deps/interface.Tpo .deps/interface.Plo
+mv -f .deps/tabinit.Tpo .deps/tabinit.Plo
+mv -f .deps/layer1.Tpo .deps/layer1.Plo
+mv -f .deps/layer2.Tpo .deps/layer2.Plo
+mv -f .deps/layer3.Tpo .deps/layer3.Plo
+/bin/bash ../libtool  --tag=CC   --mode=link aarch64-linux-android-gcc  -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS   -o libmpgdecoder.la  common.lo dct64_i386.lo decode_i386.lo interface.lo layer1.lo layer2.lo layer3.lo tabinit.lo  
+libtool: link: aarch64-linux-android-ar cru .libs/libmpgdecoder.a  common.o dct64_i386.o decode_i386.o interface.o layer1.o layer2.o layer3.o tabinit.o
+libtool: link: aarch64-linux-android-ranlib .libs/libmpgdecoder.a
+libtool: link: ( cd ".libs" && rm -f "libmpgdecoder.la" && ln -s "../libmpgdecoder.la" "libmpgdecoder.la" )
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/mpglib'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/mpglib'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/mpglib'
+Making install in libmp3lame
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame'
+Making install in i386
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame/i386'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame/i386'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame/i386'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame/i386'
+Making install in vector
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame/vector'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame/vector'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame/vector'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame/vector'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame'
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT VbrTag.lo -MD -MP -MF .deps/VbrTag.Tpo -c -o VbrTag.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT bitstream.lo -MD -MP -MF .deps/bitstream.Tpo -c -o bitstream.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/bitstream.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT encoder.lo -MD -MP -MF .deps/encoder.Tpo -c -o encoder.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/encoder.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT fft.lo -MD -MP -MF .deps/fft.Tpo -c -o fft.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/fft.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT gain_analysis.lo -MD -MP -MF .deps/gain_analysis.Tpo -c -o gain_analysis.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/gain_analysis.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT id3tag.lo -MD -MP -MF .deps/id3tag.Tpo -c -o id3tag.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/id3tag.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT lame.lo -MD -MP -MF .deps/lame.Tpo -c -o lame.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT newmdct.lo -MD -MP -MF .deps/newmdct.Tpo -c -o newmdct.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/newmdct.c
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT id3tag.lo -MD -MP -MF .deps/id3tag.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/id3tag.c  -fPIC -DPIC -o id3tag.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT encoder.lo -MD -MP -MF .deps/encoder.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/encoder.c  -fPIC -DPIC -o encoder.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT bitstream.lo -MD -MP -MF .deps/bitstream.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/bitstream.c  -fPIC -DPIC -o bitstream.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT gain_analysis.lo -MD -MP -MF .deps/gain_analysis.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/gain_analysis.c  -fPIC -DPIC -o gain_analysis.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT fft.lo -MD -MP -MF .deps/fft.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/fft.c  -fPIC -DPIC -o fft.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT VbrTag.lo -MD -MP -MF .deps/VbrTag.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c  -fPIC -DPIC -o VbrTag.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT newmdct.lo -MD -MP -MF .deps/newmdct.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/newmdct.c  -fPIC -DPIC -o newmdct.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT lame.lo -MD -MP -MF .deps/lame.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c  -fPIC -DPIC -o lame.o
+mv -f .deps/VbrTag.Tpo .deps/VbrTag.Plo
+mv -f .deps/fft.Tpo .deps/fft.Plo
+mv -f .deps/newmdct.Tpo .deps/newmdct.Plo
+mv -f .deps/lame.Tpo .deps/lame.Plo
+mv -f .deps/encoder.Tpo .deps/encoder.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT presets.lo -MD -MP -MF .deps/presets.Tpo -c -o presets.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT psymodel.lo -MD -MP -MF .deps/psymodel.Tpo -c -o psymodel.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/psymodel.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT quantize.lo -MD -MP -MF .deps/quantize.Tpo -c -o quantize.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/quantize.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT quantize_pvt.lo -MD -MP -MF .deps/quantize_pvt.Tpo -c -o quantize_pvt.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/quantize_pvt.c
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT reservoir.lo -MD -MP -MF .deps/reservoir.Tpo -c -o reservoir.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/reservoir.c
+mv -f .deps/gain_analysis.Tpo .deps/gain_analysis.Plo
+mv -f .deps/bitstream.Tpo .deps/bitstream.Plo
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT presets.lo -MD -MP -MF .deps/presets.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c  -fPIC -DPIC -o presets.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT psymodel.lo -MD -MP -MF .deps/psymodel.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/psymodel.c  -fPIC -DPIC -o psymodel.o
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT set_get.lo -MD -MP -MF .deps/set_get.Tpo -c -o set_get.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/set_get.c
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT quantize.lo -MD -MP -MF .deps/quantize.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/quantize.c  -fPIC -DPIC -o quantize.o
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT tables.lo -MD -MP -MF .deps/tables.Tpo -c -o tables.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/tables.c
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT set_get.lo -MD -MP -MF .deps/set_get.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/set_get.c  -fPIC -DPIC -o set_get.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT reservoir.lo -MD -MP -MF .deps/reservoir.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/reservoir.c  -fPIC -DPIC -o reservoir.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT quantize_pvt.lo -MD -MP -MF .deps/quantize_pvt.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/quantize_pvt.c  -fPIC -DPIC -o quantize_pvt.o
+mv -f .deps/id3tag.Tpo .deps/id3tag.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT takehiro.lo -MD -MP -MF .deps/takehiro.Tpo -c -o takehiro.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/takehiro.c
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT tables.lo -MD -MP -MF .deps/tables.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/tables.c  -fPIC -DPIC -o tables.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT takehiro.lo -MD -MP -MF .deps/takehiro.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/takehiro.c  -fPIC -DPIC -o takehiro.o
+mv -f .deps/reservoir.Tpo .deps/reservoir.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT util.lo -MD -MP -MF .deps/util.Tpo -c -o util.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/util.c
+mv -f .deps/tables.Tpo .deps/tables.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT vbrquantize.lo -MD -MP -MF .deps/vbrquantize.Tpo -c -o vbrquantize.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/vbrquantize.c
+mv -f .deps/presets.Tpo .deps/presets.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT version.lo -MD -MP -MF .deps/version.Tpo -c -o version.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/version.c
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT util.lo -MD -MP -MF .deps/util.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/util.c  -fPIC -DPIC -o util.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT vbrquantize.lo -MD -MP -MF .deps/vbrquantize.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/vbrquantize.c  -fPIC -DPIC -o vbrquantize.o
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT version.lo -MD -MP -MF .deps/version.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/version.c  -fPIC -DPIC -o version.o
+mv -f .deps/takehiro.Tpo .deps/takehiro.Plo
+mv -f .deps/quantize_pvt.Tpo .deps/quantize_pvt.Plo
+mv -f .deps/psymodel.Tpo .deps/psymodel.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile aarch64-linux-android-gcc -DHAVE_CONFIG_H  -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I..    -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -MT mpglib_interface.lo -MD -MP -MF .deps/mpglib_interface.Tpo -c -o mpglib_interface.lo /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/mpglib_interface.c
+libtool: compile:  aarch64-linux-android-gcc -DHAVE_CONFIG_H -I. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I.. -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame -I/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/mpglib -I.. -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC -DSTDC_HEADERS -MT mpglib_interface.lo -MD -MP -MF .deps/mpglib_interface.Tpo -c /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/mpglib_interface.c  -fPIC -DPIC -o mpglib_interface.o
+mv -f .deps/quantize.Tpo .deps/quantize.Plo
+mv -f .deps/set_get.Tpo .deps/set_get.Plo
+mv -f .deps/version.Tpo .deps/version.Plo
+mv -f .deps/mpglib_interface.Tpo .deps/mpglib_interface.Plo
+mv -f .deps/util.Tpo .deps/util.Plo
+mv -f .deps/vbrquantize.Tpo .deps/vbrquantize.Plo
+/bin/bash ../libtool  --tag=CC   --mode=link aarch64-linux-android-gcc  -O3 -Wall -pipe -O3 -DANDROID -ffunction-sections -fdata-sections -fPIC  -DSTDC_HEADERS -version-info 0:0 -export-symbols /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include/libmp3lame.sym -no-undefined  -o libmp3lame.la -rpath /root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/lib VbrTag.lo bitstream.lo encoder.lo fft.lo gain_analysis.lo id3tag.lo lame.lo newmdct.lo presets.lo psymodel.lo quantize.lo quantize_pvt.lo reservoir.lo set_get.lo tables.lo takehiro.lo util.lo vbrquantize.lo version.lo mpglib_interface.lo    -lm 
+libtool: link: aarch64-linux-android-ar cru .libs/libmp3lame.a  VbrTag.o bitstream.o encoder.o fft.o gain_analysis.o id3tag.o lame.o newmdct.o presets.o psymodel.o quantize.o quantize_pvt.o reservoir.o set_get.o tables.o takehiro.o util.o vbrquantize.o version.o mpglib_interface.o
+libtool: link: aarch64-linux-android-ranlib .libs/libmp3lame.a
+libtool: link: ( cd ".libs" && rm -f "libmp3lame.la" && ln -s "../libmp3lame.la" "libmp3lame.la" )
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame'
+make[3]: Nothing to be done for 'install-data-am'.
+ /usr/bin/mkdir -p '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/lib'
+ /bin/bash ../libtool   --mode=install /usr/bin/install -c   libmp3lame.la '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/lib'
+libtool: install: /usr/bin/install -c .libs/libmp3lame.lai /root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/lib/libmp3lame.la
+libtool: install: /usr/bin/install -c .libs/libmp3lame.a /root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/lib/libmp3lame.a
+libtool: install: chmod 644 /root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/lib/libmp3lame.a
+libtool: install: aarch64-linux-android-ranlib /root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/lib/libmp3lame.a
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/libmp3lame'
+Making install in frontend
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/frontend'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/frontend'
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/frontend'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/frontend'
+Making install in Dll
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/Dll'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/Dll'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/Dll'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/Dll'
+Making install in doc
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc'
+Making install in html
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc/html'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc/html'
+make[3]: Nothing to be done for 'install-exec-am'.
+ /usr/bin/mkdir -p '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/share/doc/lame/html'
+ /usr/bin/install -c -m 644 /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/about.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/abr.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/cbr.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/contact.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/contributors.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/detailed.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/history.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/index.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/introduction.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/links.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/list.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/ms_stereo.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/usage.html /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/html/vbr.html '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/share/doc/lame/html'
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc/html'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc/html'
+Making install in man
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc/man'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc/man'
+make[3]: Nothing to be done for 'install-exec-am'.
+ /usr/bin/mkdir -p '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/share/man/man1'
+ /usr/bin/install -c -m 644 /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/doc/man/lame.1 '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/share/man/man1'
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc/man'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc/man'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/doc'
+Making install in include
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/include'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/include'
+make[2]: Nothing to be done for 'install-exec-am'.
+ /usr/bin/mkdir -p '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/include/lame'
+ /usr/bin/install -c -m 644 /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/include/lame.h '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/include/lame'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/include'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/include'
+Making install in misc
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/misc'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/misc'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/misc'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/misc'
+Making install in dshow
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/dshow'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/dshow'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/dshow'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/dshow'
+Making install in ACM
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM'
+Making install in ADbg
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/ADbg'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/ADbg'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/ADbg'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/ADbg'
+Making install in ddk
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/ddk'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/ddk'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/ddk'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/ddk'
+Making install in tinyxml
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/tinyxml'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/tinyxml'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/tinyxml'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM/tinyxml'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/ACM'
+Making install in mac
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/mac'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/mac'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/mac'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/mac'
+Making install in macosx
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx'
+Making install in English.lproj
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx/English.lproj'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx/English.lproj'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx/English.lproj'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx/English.lproj'
+Making install in LAME.xcodeproj
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx/LAME.xcodeproj'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx/LAME.xcodeproj'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx/LAME.xcodeproj'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx/LAME.xcodeproj'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx'
+make[3]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx'
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/macosx'
+Making install in vc_solution
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/vc_solution'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/vc_solution'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/vc_solution'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build/vc_solution'
+make[1]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build'
+make[2]: Entering directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build'
+make[1]: Leaving directory '/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/build'
+cargo:root=/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out
+cargo:rustc-link-search=native=/root/Kokoros/jnilibs/target/aarch64-linux-android/release/build/mp3lame-sys-8d5cd204dc523a96/out/lib
+cargo:rustc-link-lib=static=mp3lame

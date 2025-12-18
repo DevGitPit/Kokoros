@@ -1,0 +1,248 @@
+make: warning: -j8 forced in submake: resetting jobserver mode.
+Makefile:622: warning: ignoring prerequisites on suffix rule definition
+Makefile:619: warning: ignoring prerequisites on suffix rule definition
+Makefile:622: warning: ignoring prerequisites on suffix rule definition
+Makefile:619: warning: ignoring prerequisites on suffix rule definition
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c:641:13: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+  641 |         if (EQ(gfp->compression_ratio, 0))
+      |             ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:170:12: note: expanded from macro 'EQ'
+  170 | (fabs(a) > fabs(b)) \
+      |            ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c:641:13: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:170:12: note: expanded from macro 'EQ'
+  170 | (fabs(a) > fabs(b)) \
+      |            ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c:641:13: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+  641 |         if (EQ(gfp->compression_ratio, 0))
+      |             ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:172:23: note: expanded from macro 'EQ'
+  172 |  : (fabs((a)-(b)) <= (fabs(b) * 1e-6f)))
+      |                       ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c:641:13: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:172:23: note: expanded from macro 'EQ'
+  172 |  : (fabs((a)-(b)) <= (fabs(b) * 1e-6f)))
+      |                       ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c:1606:13: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+ 1606 |         if (NEQ(RadioGain, GAIN_NOT_ENOUGH_SAMPLES)) {
+      |             ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:177:20: note: expanded from macro 'NEQ'
+  177 | #define NEQ(a,b) (!EQ(a,b))
+      |                    ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:170:12: note: expanded from macro 'EQ'
+  170 | (fabs(a) > fabs(b)) \
+      |            ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c:1606:13: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:177:20: note: expanded from macro 'NEQ'
+  177 | #define NEQ(a,b) (!EQ(a,b))
+      |                    ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:170:12: note: expanded from macro 'EQ'
+  170 | (fabs(a) > fabs(b)) \
+      |            ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c:1606:13: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+ 1606 |         if (NEQ(RadioGain, GAIN_NOT_ENOUGH_SAMPLES)) {
+      |             ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:177:20: note: expanded from macro 'NEQ'
+  177 | #define NEQ(a,b) (!EQ(a,b))
+      |                    ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:172:23: note: expanded from macro 'EQ'
+  172 |  : (fabs((a)-(b)) <= (fabs(b) * 1e-6f)))
+      |                       ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/lame.c:1606:13: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:177:20: note: expanded from macro 'NEQ'
+  177 | #define NEQ(a,b) (!EQ(a,b))
+      |                    ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:172:23: note: expanded from macro 'EQ'
+  172 |  : (fabs((a)-(b)) <= (fabs(b) */root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c: 1e-6f)))
+      |                       ^
+263:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  263 |     SHIFT_IN_BITS_VALUE(buffer[0], 8u, 0xffu);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:265:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  265 |     SHIFT_IN_BITS_VALUE(buffer[1], 3u, 7);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:266:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  266 |     SHIFT_IN_BITS_VALUE(buffer[1], 1u, (cfg->samplerate_out < 16000) ? 0 : 1);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:267:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  267 |     SHIFT_IN_BITS_VALUE(buffer[1], 1u, cfg->version);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:268:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  268 |     SHIFT_IN_BITS_VALUE(buffer[1], 2u, 4 - 3);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:269:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  269 |     SHIFT_IN_BITS_VALUE(buffer[1], 1u, (!cfg->error_protection) ? 1 : 0);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:271:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  271 |     SHIFT_IN_BITS_VALUE(buffer[2], 4u, eov->bitrate_index);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:272:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  272 |     SHIFT_IN_BITS_VALUE(buffer[2], 2u, cfg->samplerate_index);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:273:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  273 |     SHIFT_IN_BITS_VALUE(buffer[2], 1u, 0);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:274:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  274 |     SHIFT_IN_BITS_VALUE(buffer[2], 1u, cfg->extension);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:276:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  276 |     SHIFT_IN_BITS_VALUE(buffer[3], 2u, cfg->mode);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:277:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  277 |     SHIFT_IN_BITS_VALUE(buffer[3], 2u, eov->mode_ext);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:278:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  278 |     SHIFT_IN_BITS_VALUE(buffer[3], 1u, cfg->copyright);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:279:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  279 |     SHIFT_IN_BITS_VALUE(buffer[3], 1u, cfg->original);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:280:5: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+  280 |     SHIFT_IN_BITS_VALUE(buffer[3], 2u, cfg->emphasis);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:254:68: note: expanded from macro 'SHIFT_IN_BITS_VALUE'
+  254 | #define SHIFT_IN_BITS_VALUE(x,n,v) ( x = (x << (n)) | ( (v) & ~(-1 << (n)) ) )
+      |                                                                 ~~ ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/VbrTag.c:430:23: warning: comparison of array 'pTagData->toc' not equal to a null pointer is always true [-Wtautological-pointer-compare]
+  430 |         if (pTagData->toc != NULL) {
+      |             ~~~~~~~~~~^~~    ~~~~
+16 warnings generated.
+4 warnings generated.
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/bitstream.c:990:34: warning: unused variable 'cfg' [-Wunused-variable]
+  990 |     SessionConfig_t const *const cfg = &gfc->cfg;
+      |                                  ^~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/bitstream.c:991:32: warning: unused variable 'rsv' [-Wunused-variable]
+  991 |     RpgStateVar_t const *const rsv = &gfc->sv_rpg;
+      |                                ^~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/bitstream.c:992:24: warning: unused variable 'rov' [-Wunused-variable]
+  992 |     RpgResult_t *const rov = &gfc->ov_rpg;
+      |                        ^~~
+3 warnings generated.
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/psymodel.c:1413:25: warning: argument 'energy' of type 'FLOAT[4]' (aka 'float[4]') with mismatched bound [-Warray-parameter]
+ 1413 |                   FLOAT energy[4], int blocktype_d[2])
+      |                         ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/psymodel.h:36:62: note: previously declared as 'FLOAT[2]' (aka 'float[2]') here
+   36 |                           FLOAT pe[2], FLOAT pe_MS[2], FLOAT ener[2], int blocktype_d[2]);
+      |                                                              ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:170:5: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+  170 |     SET_OPTION(quant_comp, set->quant_comp, -1);
+      |     ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:36:16: note: expanded from macro 'SET_OPTION'
+   36 |     else if (!(fabs(lame_get_##opt(gfp) - def) > 0)) \
+      |                ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:170:5: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:36:16: note: expanded from macro 'SET_OPTION'
+   36 |     else if (!(fabs(lame_get_##opt(gfp) - def) > 0)) \
+      |                ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:171:5: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+  171 |     SET_OPTION(quant_comp_short, set->quant_comp_s, -1);
+      |     ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:36:16: note: expanded from macro 'SET_OPTION'
+   36 |     else if (!(fabs(lame_get_##opt(gfp) - def) > 0)) \
+      |                ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:171:5: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:36:16: note: expanded from macro 'SET_OPTION'
+   36 |     else if (!(fabs(lame_get_##opt(gfp) - def) > 0)) \
+      |                ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:284:5: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+  284 |     SET_OPTION(quant_comp, abr_switch_map[r].quant_comp, -1);
+      |     ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:36:16: note: expanded from macro 'SET_OPTION'
+   36 |     else if (!(fabs(lame_get_##opt(gfp) - def) > 0)) \
+      |                ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:284:5: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:36:16: note: expanded from macro 'SET_OPTION'
+   36 |     else if (!(fabs(lame_get_##opt(gfp) - def) > 0)) \
+      |                ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:285:5: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+  285 |     SET_OPTION(quant_comp_short, abr_switch_map[r].quant_comp_s, -1);
+      |     ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:36:16: note: expanded from macro 'SET_OPTION'
+   36 |     else if (!(fabs(lame_get_##opt(gfp) - def) > 0)) \
+      |                ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:285:5: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/presets.c:36:16: note: expanded from macro 'SET_OPTION'
+   36 |     else if (!(fabs(lame_get_##opt(gfp) - def) > 0)) \
+      |                ^
+4 warnings generated.
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/quantize_pvt.c:430:46: warning: argument 'pe' of type 'const FLOAT[][2]' (aka 'const float[][2]') with mismatched bound [-Warray-parameter]
+  430 | on_pe(lame_internal_flags * gfc, const FLOAT pe[][2], int targ_bits[2], int mean_bits, int gr, int cbr)
+      |                                              ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/quantize_pvt.h:84:54: note: previously declared as 'const FLOAT[2][2]' (aka 'const float[2][2]') here
+   84 | int     on_pe(lame_internal_flags * gfc, const FLOAT pe[2][2],
+      |                                                      ^
+1 warning generated.
+1 warning generated.
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/set_get.c:1726:72: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+ 1726 |         assert((0 <= gfp->interChRatio && gfp->interChRatio <= 1.0) || EQ(gfp->interChRatio, -1));
+      |                                                                        ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:170:12: note: expanded from macro 'EQ'
+  170 | (fabs(a) > fabs(b)) \
+      |            ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/set_get.c:1726:72: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:170:12: note: expanded from macro 'EQ'
+  170 | (fabs(a) > fabs(b)) \
+      |            ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/set_get.c:1726:72: warning: using floating point absolute value function 'fabs' when argument is of integer type [-Wabsolute-value]
+ 1726 |         assert((0 <= gfp->interChRatio && gfp->interChRatio <= 1.0) || EQ(gfp->interChRatio, -1));
+      |                                                                        ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:172:23: note: expanded from macro 'EQ'
+  172 |  : (fabs((a)-(b)) <= (fabs(b) * 1e-6f)))
+      |                       ^
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/set_get.c:1726:72: note: use function 'abs' instead
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/machine.h:172:23: note: expanded from macro 'EQ'
+  172 |  : (fabs((a)-(b)) <= (fabs(b) * 1e-6f)))
+      |                       ^
+2 warnings generated.
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/vbrquantize.c:108:18: warning: unused variable 'MAGIC_INT' [-Wunused-const-variable]
+  108 | static int const MAGIC_INT = MAGIC_INT_def;
+      |                  ^~~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/vbrquantize.c:110:22: warning: unused variable 'ROUNDFAC' [-Wunused-const-variable]
+  110 | static DOUBLEX const ROUNDFAC = ROUNDFAC_def;
+      |                      ^~~~~~~~
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mp3lame-sys-0.1.11/lame-3.100/libmp3lame/vbrquantize.c:112:22: warning: unused variable 'MAGIC_FLOAT' [-Wunused-const-variable]
+  112 | static DOUBLEX const MAGIC_FLOAT = MAGIC_FLOAT_def;
+      |                      ^~~~~~~~~~~
+3 warnings generated.
