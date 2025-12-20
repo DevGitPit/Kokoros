@@ -11,7 +11,7 @@ object KokoroJNI {
     // Load native libraries
     init {
         try {
-            System.loadLibrary("onnxruntime") // Load dependency first
+            System.loadLibrary("onnxruntime")
             System.loadLibrary("kokoros_android")
             Log.i(TAG, "Native libraries loaded successfully.")
         } catch (e: UnsatisfiedLinkError) {
@@ -26,7 +26,7 @@ object KokoroJNI {
      * @param intraThreads Number of threads for ONNX Runtime.
      * @return A pointer (long) to the native engine instance, or 0 if initialization fails.
      */
-    private external fun init(modelPath: String, voicesPath: String, intraThreads: Int): Long
+    private external fun init(modelPath: String, voicesPath: String, espeakDataPath: String, intraThreads: Int): Long
 
     /**
      * Synthesizes text to raw PCM audio samples.
@@ -46,9 +46,9 @@ object KokoroJNI {
 
     // --- High-level Kotlin API ---
 
-    fun initialize(modelPath: String, voicesPath: String, intraThreads: Int): Boolean {
+    fun initialize(modelPath: String, voicesPath: String, espeakDataPath: String, intraThreads: Int): Boolean {
         if (enginePtr == 0L) {
-            enginePtr = init(modelPath, voicesPath, intraThreads)
+            enginePtr = init(modelPath, voicesPath, espeakDataPath, intraThreads)
         }
         return enginePtr != 0L
     }

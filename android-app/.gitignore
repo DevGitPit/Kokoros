@@ -15,3 +15,15 @@
 *.so
 .ndk/
 
+
+# Large models and artifacts
+*.onnx
+*.zip
+*.hprof
+jnilibs_src/output/
+jnilibs_src/target/
+jnilibs_src/output_clean/
+onnxruntime_extracted/
+*.o
+*.a
+

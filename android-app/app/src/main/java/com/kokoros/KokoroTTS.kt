@@ -1,15 +1,20 @@
 package com.kokoros
 
 import android.content.Context
-import android.content.res.AssetFileDescriptor
 import android.os.Bundle
 import android.speech.tts.SynthesisCallback
+import android.speech.tts.SynthesisRequest
+import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeechService
+import android.speech.tts.Voice
 import android.util.Log
 import kotlinx.coroutines.*
 import java.io.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.Locale
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class KokoroTTS : TextToSpeechService() {
 
@@ -17,10 +22,14 @@ class KokoroTTS : TextToSpeechService() {
     private val scope = CoroutineScope(Dispatchers.Default)
 
     private var ttsInitialized = false
+    private val initLatch = CountDownLatch(1)
     private var modelPath: String? = null
     private var voicesPath: String? = null
 
     private val sampleRate = 24000 // Fixed sample rate from Rust engine
+
+    @Volatile
+    private var stopRequested = false
 
     override fun onCreate() {
         super.onCreate()
@@ -34,9 +43,11 @@ class KokoroTTS : TextToSpeechService() {
                 val filesDir = applicationContext.filesDir
                 modelPath = File(filesDir, MODEL_ONNX_FP16).absolutePath
                 voicesPath = File(filesDir, VOICES_BIN).absolutePath
+                val espeakParentPath = filesDir.absolutePath // espeak-ng expects path to parent of 'espeak-ng-data'
 
-                val threads = Runtime.getRuntime().availableProcessors().coerceIn(1, 4) // Limit threads
-                ttsInitialized = KokoroJNI.initialize(modelPath!!, voicesPath!!, threads)
+                val threads = Runtime.getRuntime().availableProcessors().coerceIn(1, 8)
+                val threadCount = if (threads >= 5) 5 else threads
+                ttsInitialized = KokoroJNI.initialize(modelPath!!, voicesPath!!, espeakParentPath, threadCount)
                 if (ttsInitialized) {
                     Log.i(TAG, "Kokoro TTS engine initialized successfully.")
                 } else {
@@ -45,6 +56,7 @@ class KokoroTTS : TextToSpeechService() {
             } else {
                 Log.e(TAG, "Failed to copy assets.")
             }
+            initLatch.countDown()
         }
     }
 
@@ -55,91 +67,181 @@ class KokoroTTS : TextToSpeechService() {
         scope.cancel() // Cancel all coroutines
     }
 
-    override fun onIs
-        (lang: String?, country: String?, variant: String?): Int {
-        // We will support English ("en") as default for now
-        if (lang != null && lang.equals("en", ignoreCase = true)) {
-            return TextToSpeech.
-                // Indicate that the engine is ready for language (and region if provided)
-                LANG_COUNTRY_VAR_AVAILABLE
+    override fun onIsLanguageAvailable(lang: String?, country: String?, variant: String?): Int {
+        if (lang != null && (lang.equals("en", ignoreCase = true) || lang.equals("eng", ignoreCase = true))) {
+            return TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE
         }
         return TextToSpeech.LANG_NOT_SUPPORTED
     }
 
-    override fun onGetDefaultEngine(): String {
-        return "com.kokoros" // Package name as default engine ID
+    override fun onGetLanguage(): Array<String> {
+        return arrayOf("eng", "USA", "")
     }
 
-    override fun onGetSampleRate(): String {
-        return sampleRate.toString()
+    override fun onLoadLanguage(lang: String?, country: String?, variant: String?): Int {
+        return onIsLanguageAvailable(lang, country, variant)
     }
 
-    override fun onGetFeaturesForLanguage(lang: String?, country: String?, variant: String?): Array<String> {
-        // You can expose custom features here if needed.
-        // For now, return empty array.
-        return emptyArray()
+    override fun onStop() {
+        Log.i(TAG, "onStop called.")
+        stopRequested = true
     }
 
     override fun onGetVoices(): MutableList<Voice> {
         val voices = mutableListOf<Voice>()
-        // TODO: Dynamically retrieve available voices from Rust engine
-        // For now, add a placeholder voice for English
-        val defaultVoice = Voice(
-            "kokoros-en-default", // Name
-            Locale("en", "US"), // Locale
-            Voice.QUALITY_NORMAL, // Quality
-            Voice.LATENCY_NORMAL, // Latency
-            false, // Not local (comes from the engine)
-            emptySet() // Features
+        val voiceNames = listOf(
+            "af_heart", "af_sky", "af_bella", "af_nicole", "af_sarah",
+            "am_adam", "am_michael",
+            "bf_emma", "bf_isabella",
+            "bm_george", "bm_lewis"
         )
-        voices.add(defaultVoice)
+        
+        for (name in voiceNames) {
+            voices.add(Voice(
+                name,
+                Locale("en", "US"),
+                Voice.QUALITY_VERY_HIGH,
+                Voice.LATENCY_NORMAL,
+                false,
+                emptySet()
+            ))
+        }
         return voices
     }
 
-    override fun onSynthesizeText(
-        text: String?,
-        bundle: Bundle?,
-        callback: SynthesisCallback?
-    ) {
-        if (!ttsInitialized || text == null || callback == null) {
-            Log.e(TAG, "TTS not initialized, text is null, or callback is null.")
-            callback?.error()
+    override fun onSynthesizeText(req: SynthesisRequest?, callback: SynthesisCallback?) {
+        if (req == null || callback == null) return
+
+        val text = req.charSequenceText?.toString()
+        if (text == null) {
+            callback.error()
             return
         }
 
-        // Get voice and speed from bundle or use defaults
-        val voiceName = bundle?.getString(TextToSpeech.Engine.KEY_PARAM_VOICE, "af_sky") ?: "af_sky"
-        val speechRate = bundle?.getFloat(TextToSpeech.Engine.KEY_PARAM_RATE, 1.0f) ?: 1.0f
+        // Wait for initialization if needed
+        if (!ttsInitialized) {
+            try {
+                if (!initLatch.await(5, TimeUnit.SECONDS)) {
+                    Log.e(TAG, "Timed out waiting for TTS initialization.")
+                    callback.error()
+                    return
+                }
+            } catch (e: InterruptedException) {
+                Log.e(TAG, "Interrupted waiting for TTS initialization.")
+                callback.error()
+                return
+            }
+        }
 
-        callback.start(sampleRate, android.speech.tts.AudioFormat.ENCODING_PCM_FLOAT, 1) // Float PCM, Mono
+        if (!ttsInitialized) {
+             Log.e(TAG, "TTS failed to initialize.")
+             callback.error()
+             return
+        }
 
-        val floatSamples = KokoroJNI.synthesize(text, voiceName, speechRate)
+        // Load Preferences
+        val prefs = applicationContext.getSharedPreferences("KokoroPrefs", Context.MODE_PRIVATE)
+        val prefVoice = prefs.getString("voice_skin", "af_sky") ?: "af_sky"
+        val prefSpeedMult = prefs.getFloat("speed_multiplier", 1.0f)
 
-        if (floatSamples != null) {
-            val byteBuffer = floatArrayToByteBuffer(floatSamples)
-            callback.audioAvailable(byteBuffer, 0, byteBuffer.remaining())
-            callback.done()
+        stopRequested = false
+        
+        // Determine voice: Use request voice if valid, otherwise preference
+        val validVoices = listOf(
+            "af_heart", "af_sky", "af_bella", "af_nicole", "af_sarah",
+            "am_adam", "am_michael", "bf_emma", "bf_isabella",
+            "bm_george", "bm_lewis"
+        )
+        val reqVoice = req.voiceName
+        val voiceName = if (reqVoice != null && validVoices.contains(reqVoice)) {
+            reqVoice
         } else {
-            Log.e(TAG, "Synthesis failed for text: $text")
+            prefVoice
+        }
+
+        val speechRate = (req.speechRate.toFloat() / 100.0f) // Normalized rate
+        
+        // Debug: Log code points to see what is actually coming in
+        val debugPoints = text.take(50).codePoints().toArray().joinToString(" ") { "U+%04X".format(it) }
+        Log.i(TAG, "Input Text CodePoints: $debugPoints")
+
+        // Clean up text glitches
+        // Replace corrupted CP437 sequences and standard smart quotes
+        var cleanText = text
+            .replace("\u0393\u00C7\u00FF", "'") // ΓÇÿ -> '
+            .replace("\u0393\u00C7\u00D6", "'") // ΓÇÖ -> '
+            .replace("ΓÇÿ", "'")
+            .replace("ΓÇÖ", "'")
+            .replace("[\u2018\u2019\u201B]".toRegex(), "'") // Smart single quotes
+            .replace("[\u201C\u201D]".toRegex(), "\"") // Smart double quotes
+
+        Log.i(TAG, "Synthesizing text: \"$cleanText\" with voice: $voiceName, rate: $speechRate (PrefMult: $prefSpeedMult)")
+
+        // Use native 24kHz - no upsampling!
+        val playbackRate = 24000
+        callback.start(playbackRate, android.media.AudioFormat.ENCODING_PCM_16BIT, 1)
+
+        // Use cleaned text directly to preserve full prosody
+        val sentences = listOf(cleanText) 
+        
+        Log.i(TAG, "=== SPEED ADJUSTMENT ===")
+        val baseSpeed = req.speechRate.toFloat() / 100.0f
+        // Apply preference multiplier (default 1.0f)
+        val adjustedSpeed = baseSpeed * prefSpeedMult
+        Log.i(TAG, "System rate: ${req.speechRate}, Adjusted speed for Kokoro: $adjustedSpeed")
+
+        var success = false
+        for (sentence in sentences) {
+            if (stopRequested) break
+            
+            val floatSamples = synchronized(this) {
+                if (stopRequested) return@synchronized null
+                KokoroJNI.synthesize(sentence, voiceName, adjustedSpeed)
+            }
+
+            if (floatSamples != null) {
+                success = true
+                Log.i(TAG, "Generated ${floatSamples.size} samples (24kHz). Duration: ${floatSamples.size / 24000.0f}s")
+                
+                val pcmData = floatToShortPcm(floatSamples)
+                var offset = 0
+                val totalSize = pcmData.size
+                val chunkSize = 4096 
+
+                while (offset < totalSize && !stopRequested) {
+                    val shortsToWrite = (totalSize - offset).coerceAtMost(chunkSize)
+                    callback.audioAvailable(shortToByteArray(pcmData, offset, shortsToWrite), 0, shortsToWrite * 2)
+                    offset += shortsToWrite
+                }
+            }
+        }
+
+        if (success && !stopRequested) {
+            callback.done()
+        } else if (!stopRequested) {
             callback.error()
+        } else {
+            callback.done() // Was stopped
         }
     }
 
-    override fun onStop() {
-        // Stop any ongoing synthesis if necessary
-        Log.i(TAG, "onStop called.")
-        // Our current Rust implementation is synchronous, so no explicit stop needed in Rust.
-        // If it were streaming, we'd send a stop signal here.
+    private fun floatToShortPcm(floatArray: FloatArray): ShortArray {
+        val shortArray = ShortArray(floatArray.size)
+        for (i in floatArray.indices) {
+            // Clip and scale to 16-bit range
+            val s = (floatArray[i] * 32767.0f).coerceIn(-32768.0f, 32767.0f).toInt().toShort()
+            shortArray[i] = s
+        }
+        return shortArray
     }
 
-    private fun floatArrayToByteBuffer(floatArray: FloatArray): ByteBuffer {
-        val byteBuffer = ByteBuffer.allocate(floatArray.size * 4) // 4 bytes per float
-        byteBuffer.order(ByteOrder.LITTLE_ENDIAN) // PCM is typically little-endian
-        for (f in floatArray) {
-            byteBuffer.putFloat(f)
+    private fun shortToByteArray(shortArray: ShortArray, offset: Int, length: Int): ByteArray {
+        val byteArray = ByteArray(length * 2)
+        val buffer = ByteBuffer.wrap(byteArray).order(ByteOrder.LITTLE_ENDIAN)
+        for (i in 0 until length) {
+            buffer.putShort(shortArray[offset + i])
         }
-        byteBuffer.flip() // Prepare for reading
-        return byteBuffer
+        return byteArray
     }
 
     private suspend fun copyAssetsToInternalStorage(context: Context): Boolean {
@@ -147,13 +249,32 @@ class KokoroTTS : TextToSpeechService() {
             try {
                 val filesDir = context.filesDir
                 val assetManager = context.assets
-
-                // Copy ONNX model
                 copyAssetFile(assetManager, MODEL_ONNX_FP16, File(filesDir, MODEL_ONNX_FP16))
-                // Copy Voices data
                 copyAssetFile(assetManager, VOICES_BIN, File(filesDir, VOICES_BIN))
+                
+                val espeakDataDir = File(filesDir, "espeak-ng-data")
+                val phondataFile = File(espeakDataDir, "phondata")
+                
+                // Check if extracted data exists and is correctly structured
+                if (!phondataFile.exists()) {
+                    Log.i(TAG, "espeak-ng-data missing or incomplete, extracting...")
+                    if (espeakDataDir.exists()) {
+                        espeakDataDir.deleteRecursively()
+                    }
+                    
+                    // Extract espeak-ng-data.zip into filesDir
+                    // Zip contains 'espeak-ng-data/' directory already
+                    val zipFile = File(filesDir, "espeak-ng-data.zip")
+                    copyAssetFile(assetManager, "espeak-ng-data.zip", zipFile)
+                    
+                    extractZip(zipFile, filesDir)
+                    zipFile.delete() // Clean up zip
+                    Log.i(TAG, "Extracted espeak-ng-data successfully.")
+                } else {
+                     Log.i(TAG, "espeak-ng-data already present.")
+                }
 
-                Log.i(TAG, "Assets copied to: ${filesDir.absolutePath}")
+                Log.i(TAG, "Assets ready at: ${filesDir.absolutePath}")
                 true
             } catch (e: Exception) {
                 Log.e(TAG, "Error copying assets: ${e.message}", e)
@@ -163,14 +284,28 @@ class KokoroTTS : TextToSpeechService() {
     }
 
     private fun copyAssetFile(assetManager: android.content.res.AssetManager, assetName: String, destFile: File) {
-        if (destFile.exists()) {
-            Log.d(TAG, "Asset $assetName already exists, skipping copy.")
-            return
-        }
-
+        if (destFile.exists()) return
         assetManager.open(assetName).use { input ->
             FileOutputStream(destFile).use { output ->
                 input.copyTo(output)
+            }
+        }
+    }
+
+    private fun extractZip(zipFile: File, destDir: File) {
+        java.util.zip.ZipFile(zipFile).use { zip ->
+            zip.entries().asSequence().forEach { entry ->
+                val outFile = File(destDir, entry.name)
+                if (entry.isDirectory) {
+                    outFile.mkdirs()
+                } else {
+                    outFile.parentFile?.mkdirs()
+                    zip.getInputStream(entry).use { input ->
+                        FileOutputStream(outFile).use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                }
             }
         }
     }

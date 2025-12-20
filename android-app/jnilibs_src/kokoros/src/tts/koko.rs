@@ -89,6 +89,7 @@ pub struct InitConfig {
     pub model_url: String,
     pub voices_url: String,
     pub sample_rate: u32,
+    pub intra_threads: usize,
 }
 
 impl Default for InitConfig {
@@ -97,6 +98,7 @@ impl Default for InitConfig {
             model_url: "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx".into(),
             voices_url: "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin".into(),
             sample_rate: 24000,
+            intra_threads: 5,
         }
     }
 }
@@ -120,7 +122,7 @@ impl TTSKoko {
         }
 
         let model = Arc::new(Mutex::new(
-            ort_koko::OrtKoko::new(model_path.to_string())
+            ort_koko::OrtKoko::new(model_path.to_string(), cfg.intra_threads)
                 .expect("Failed to create Kokoro TTS model"),
         ));
         // TODO: if(not streaming) { model.print_info(); }
@@ -331,7 +333,7 @@ impl TTSKoko {
             out
         }
 
-        let items = split_words_and_punct(text);
+        let items = split_words_and_punct(&text);
 
         // 3) For each item, get its standalone phonemes and token count.
         //    Punctuation-only items get zero tokens but we still record them for timestamps.
@@ -422,6 +424,7 @@ impl TTSKoko {
                 .unwrap_or_default()
                 .join("")
         };
+        tracing::debug!("eSpeak phonemes ({}): '{}'", lan, full_phonemes);
         let all_tokens = tokenize(&full_phonemes);
         (all_tokens, Vec::new())
     }
@@ -509,120 +512,6 @@ impl TTSKoko {
         // Add the last chunk if not empty
         if !current_chunk.is_empty() {
             chunks.push(current_chunk);
-        }
-
-        chunks
-    }
-
-    /// Smart word-based chunking for async streaming
-    /// Creates chunks based on natural speech boundaries using word count and punctuation
-    pub fn split_text_into_speech_chunks(&self, text: &str, max_words: usize) -> Vec<String> {
-        let mut chunks = Vec::new();
-
-        // Split by sentence-ending punctuation first
-        let sentences: Vec<&str> = text
-            .split(|c| c == '.' || c == '!' || c == '?')
-            .filter(|s| !s.trim().is_empty())
-            .collect();
-
-        for sentence in sentences {
-            let sentence = sentence.trim();
-            if sentence.is_empty() {
-                continue;
-            }
-
-            // Count words in this sentence
-            let words: Vec<&str> = sentence.split_whitespace().collect();
-            let word_count = words.len();
-
-            if word_count <= max_words {
-                // Small sentence - add as complete chunk (preserve original punctuation)
-                chunks.push(format!("{}.", sentence));
-            } else {
-                // Large sentence - split by punctuation marks while preserving them
-                let mut sub_clauses = Vec::new();
-                let mut current_pos = 0;
-
-                for (i, ch) in sentence.char_indices() {
-                    if ch == ',' || ch == ';' || ch == ':' {
-                        if i > current_pos {
-                            let clause_with_punct = format!("{}{}", &sentence[current_pos..i], ch);
-                            sub_clauses.push(clause_with_punct);
-                        }
-                        current_pos = i + 1;
-                    }
-                }
-
-                // Add remaining text
-                if current_pos < sentence.len() {
-                    sub_clauses.push(sentence[current_pos..].to_string());
-                }
-
-                let sub_clauses: Vec<&str> = sub_clauses
-                    .iter()
-                    .map(|s| s.trim())
-                    .filter(|s| !s.is_empty())
-                    .collect();
-
-                let mut current_chunk = String::new();
-                let mut current_word_count = 0;
-
-                for clause in sub_clauses {
-                    let clause = clause.trim();
-                    let clause_words: Vec<&str> = clause.split_whitespace().collect();
-                    let clause_word_count = clause_words.len();
-
-                    if current_word_count + clause_word_count <= max_words {
-                        // Add clause to current chunk (preserve original punctuation)
-                        if current_chunk.is_empty() {
-                            current_chunk = clause.to_string();
-                        } else {
-                            current_chunk = format!("{} {}", current_chunk, clause);
-                        }
-                        current_word_count += clause_word_count;
-                    } else {
-                        // Start new chunk (preserve original punctuation)
-                        if !current_chunk.is_empty() {
-                            chunks.push(current_chunk);
-                        }
-                        current_chunk = clause.to_string();
-                        current_word_count = clause_word_count;
-                    }
-                }
-
-                // Add final chunk (preserve original punctuation)
-                if !current_chunk.is_empty() {
-                    chunks.push(current_chunk);
-                }
-            }
-        }
-
-        // If no sentences found, fall back to word-based chunking
-        if chunks.is_empty() {
-            let words: Vec<&str> = text.split_whitespace().collect();
-            let mut current_chunk = String::new();
-            let mut current_word_count = 0;
-
-            for word in words {
-                if current_word_count + 1 <= max_words {
-                    if current_chunk.is_empty() {
-                        current_chunk = word.to_string();
-                    } else {
-                        current_chunk = format!("{} {}", current_chunk, word);
-                    }
-                    current_word_count += 1;
-                } else {
-                    if !current_chunk.is_empty() {
-                        chunks.push(current_chunk);
-                    }
-                    current_chunk = word.to_string();
-                    current_word_count = 1;
-                }
-            }
-
-            if !current_chunk.is_empty() {
-                chunks.push(current_chunk);
-            }
         }
 
         chunks
@@ -980,7 +869,7 @@ impl TTSKokoParallel {
                 num_instances
             );
             let model = Arc::new(Mutex::new(
-                ort_koko::OrtKoko::new(model_path.to_string())
+                ort_koko::OrtKoko::new(model_path.to_string(), cfg.intra_threads)
                     .expect("Failed to create Kokoro TTS model"),
             ));
             models.push(model);
@@ -1054,7 +943,7 @@ impl TTSKokoParallel {
     }
 
     /// Forward compatibility - split text method
-    pub fn split_text_into_speech_chunks(&self, text: &str, max_words: usize) -> Vec<String> {
+    pub fn split_text_into_chunks(&self, text: &str, max_tokens: usize, lan: &str) -> Vec<String> {
         // Use TTSKoko's implementation for now - create temporary instance
         let temp_tts = TTSKoko {
             model_path: self.model_path.clone(),
@@ -1062,7 +951,7 @@ impl TTSKokoParallel {
             styles: self.styles.clone(),
             init_config: self.init_config.clone(),
         };
-        temp_tts.split_text_into_speech_chunks(text, max_words)
+        temp_tts.split_text_into_chunks(text, max_tokens, lan)
     }
 
     /// Get available voices
