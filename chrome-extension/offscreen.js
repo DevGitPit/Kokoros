@@ -218,6 +218,19 @@ chrome.runtime.onMessage.addListener((msg) => {
         case 'ACT_STOP':
             userPause();
             break;
+        case 'CMD_GET_STATE':
+            if (typeof sendResponse === 'function') {
+                sendResponse({
+                    isStreaming,
+                    isPaused,
+                    text: lastStreamParams ? lastStreamParams.text : null,
+                    voice: lastStreamParams ? lastStreamParams.voice : null,
+                    speed: lastStreamParams ? lastStreamParams.speed : 1.0,
+                    bufferTarget: lastStreamParams ? lastStreamParams.bufferTarget : 2,
+                    index: lastPlayedIndex
+                });
+            }
+            break;
     }
 });
 

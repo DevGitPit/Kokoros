@@ -173,15 +173,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Diagnostic: Check for Offscreen support
         try {
             const contexts = await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] });
-            console.log('Offscreen contexts:', contexts);
             if (contexts.length === 0) {
                 console.warn('⚠️ No offscreen document found! Background audio might fail on this browser.');
             }
         } catch (e) {
-            console.warn('⚠️ Failed to query offscreen contexts (Browser too old?):', e);
+            console.warn('⚠️ Failed to query offscreen contexts:', e);
         }
 
-        // Get Text
+        await checkServerAndFetchVoices();
+
+        // Check if we have an active session
+        try {
+            const state = await new Promise((resolve) => {
+                chrome.runtime.sendMessage({ type: 'CMD_GET_STATE' }, (response) => {
+                    if (chrome.runtime.lastError) resolve(null);
+                    else resolve(response);
+                });
+            });
+
+            if (state && state.text) {
+                console.log("🔄 Restoring active session...");
+                originalRawText = state.text;
+                sentences = splitIntoSentences(originalRawText);
+                
+                // Restore Text
+                textInputEl.innerText = ""; // Clear for highlight rebuild
+                highlightSentence(state.index);
+
+                // Restore Controls
+                if (state.voice) voiceSelectEl.value = state.voice;
+                if (state.speed) {
+                    speedInputEl.value = state.speed;
+                    speedValueEl.textContent = state.speed;
+                }
+                if (state.bufferTarget) bufferInputEl.value = state.bufferTarget;
+
+                // Restore Mode
+                if (state.isStreaming) {
+                    setAppMode('playing');
+                    setStatus('Playing...');
+                    // Scroll to active sentence
+                    setTimeout(() => {
+                        const active = document.getElementById('current-active-sentence');
+                        if(active) active.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                } else if (state.isPaused) {
+                    setAppMode('playing'); // UI stays in playing mode to allow Resume
+                    setStatus('Paused.');
+                    streamButton.textContent = "Resume Stream";
+                    streamButton.disabled = false; // Enable resume
+                }
+                return; // Exit, do not scrape
+            }
+        } catch (e) {
+            console.log("No active state found, scraping tab...");
+        }
+
+        // Get Text (Fallback: Scrape Tab)
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         if (tab && !tab.url.startsWith('chrome://')) {
             const res = await chrome.scripting.executeScript({
@@ -194,8 +242,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (res[0]?.result) textInputEl.innerText = res[0].result;
             else textInputEl.innerText = "No text found. Paste here.";
         }
-        
-        await checkServerAndFetchVoices();
     }
     init();
 });
