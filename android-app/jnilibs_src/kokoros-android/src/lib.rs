@@ -1,17 +1,15 @@
 use jni::objects::{JClass, JString};
 use jni::sys::{jfloatArray, jint, jlong};
 use jni::JNIEnv;
-use kokoros::tts::koko::{InitConfig, TTSKokoParallel};
+use kokoros::tts::koko::{InitConfig, TTSKoko};
 use tokio::runtime::Builder;
 use tokio::runtime::Runtime;
-use std::sync::atomic::{AtomicUsize, Ordering};
 use log::{info, error, LevelFilter};
 use android_logger::Config;
 
 struct KokoroEngine {
-    tts: TTSKokoParallel,
+    tts: TTSKoko,
     rt: Runtime,
-    counter: AtomicUsize,
 }
 
 #[unsafe(no_mangle)]
@@ -23,14 +21,13 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_init(
     espeak_data_path: JString,
     intra_threads: jint,
 ) -> jlong {
-    // Initialize Android logger with Debug level
     android_logger::init_once(
         Config::default()
             .with_tag("KokoroNative")
             .with_max_level(LevelFilter::Debug)
     );
 
-    info!("Initializing Kokoro Native Engine (Parallel, 2 instances)...");
+    info!("Initializing Kokoro Native Engine (Single Instance)...");
 
     let model_path: String = match env.get_string(&model_path) {
         Ok(s) => s.into(),
@@ -45,7 +42,7 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_init(
         Err(_) => return 0,
     };
 
-    // Set ESPEAK_DATA_PATH for libespeak-ng
+    // Set ESPEAK_DATA_PATH so libespeak-ng can find phoneme data
     unsafe {
         std::env::set_var("ESPEAK_DATA_PATH", &espeak_data_path);
     }
@@ -64,10 +61,10 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_init(
             intra_threads: intra_threads as usize,
             ..InitConfig::default()
         };
-        TTSKokoParallel::from_config_with_instances(&model_path, &voices_path, config, 2).await
+        TTSKoko::from_config(&model_path, &voices_path, config).await
     });
 
-    let engine = Box::new(KokoroEngine { tts, rt, counter: AtomicUsize::new(0) });
+    let engine = Box::new(KokoroEngine { tts, rt });
     Box::into_raw(engine) as jlong
 }
 
@@ -96,15 +93,10 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_speak_1raw(
         Err(_) => return std::ptr::null_mut(),
     };
 
-    info!("JNI speak_raw: text='{}', speed={}, voice={}", text_str, speed, voice_str);
+    info!("JNI speak_raw: voice={}, speed={}", voice_str, speed);
 
-    // Get a model instance (round-robin)
-    let worker_id = engine.counter.fetch_add(1, Ordering::SeqCst);
-    let model_instance = engine.tts.get_model_instance(worker_id);
-
-    // tts_raw_audio args: txt, lan, style, speed, silence, req_id, inst_id, chunk_num
     let audio_result = engine.rt.block_on(async {
-        engine.tts.tts_raw_audio_with_instance(
+        engine.tts.tts_raw_audio(
             &text_str,
             "en-us",
             &voice_str,
@@ -112,14 +104,12 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_speak_1raw(
             None,
             None,
             None,
-            None,
-            model_instance
+            None
         )
     });
 
     match audio_result {
         Ok(samples) => {
-            info!("JNI speak_raw: generated {} samples", samples.len());
             let output_array = match env.new_float_array(samples.len() as i32) {
                 Ok(arr) => arr,
                 Err(_) => return std::ptr::null_mut(),

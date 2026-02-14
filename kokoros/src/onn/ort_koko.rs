@@ -81,9 +81,9 @@ impl OrtBase for OrtKoko {
     }
 }
 impl OrtKoko {
-    pub fn new(model_path: String) -> Result<Self, String> {
+    pub fn new(model_path: String, intra_threads: usize) -> Result<Self, String> {
         let mut instance = OrtKoko { inner: None };
-        instance.load_model(model_path)?;
+        instance.load_model(model_path, intra_threads)?;
         Ok(instance)
     }
 

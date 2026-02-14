@@ -68,18 +68,27 @@ class KokoroTTS : TextToSpeechService() {
     }
 
     override fun onIsLanguageAvailable(lang: String?, country: String?, variant: String?): Int {
-        if (lang != null && (lang.equals("en", ignoreCase = true) || lang.equals("eng", ignoreCase = true))) {
+        if (lang == null) return TextToSpeech.LANG_NOT_SUPPORTED
+        val isEn = lang.equals("en", ignoreCase = true) || 
+                   lang.equals("eng", ignoreCase = true) || 
+                   lang.equals("usa", ignoreCase = true)
+        
+        if (isEn) {
             return TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE
         }
         return TextToSpeech.LANG_NOT_SUPPORTED
     }
 
     override fun onGetLanguage(): Array<String> {
-        return arrayOf("eng", "USA", "")
+        return arrayOf("en", "US", "")
     }
 
     override fun onLoadLanguage(lang: String?, country: String?, variant: String?): Int {
-        return onIsLanguageAvailable(lang, country, variant)
+        val result = onIsLanguageAvailable(lang, country, variant)
+        if (result >= TextToSpeech.LANG_AVAILABLE) {
+            // Potentially trigger asset check here
+        }
+        return result
     }
 
     override fun onStop() {

@@ -2,6 +2,8 @@ package com.kokoros
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -14,6 +16,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.kokoros.ui.theme.KokorosTTSTheme
 import kotlin.math.roundToInt
+
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioTrack
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.util.zip.ZipFile
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,11 +48,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SettingsScreen() {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val prefs = remember { context.getSharedPreferences("KokoroPrefs", Context.MODE_PRIVATE) }
 
-    // Load initial values
+    // State management
     var selectedVoice by remember { mutableStateOf(prefs.getString("voice_skin", "af_sky") ?: "af_sky") }
     var speedMultiplier by remember { mutableFloatStateOf(prefs.getFloat("speed_multiplier", 1.0f)) }
+    var isSynthesizing by remember { mutableStateOf(false) }
+    var isEngineReady by remember { mutableStateOf(false) }
+    var initStatus by remember { mutableStateOf("Checking assets...") }
 
     val voices = listOf(
         "af_heart", "af_sky", "af_bella", "af_nicole", "af_sarah",
@@ -47,6 +64,53 @@ fun SettingsScreen() {
         "bf_emma", "bf_isabella",
         "bm_george", "bm_lewis"
     )
+
+    // Startup Initialization
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            try {
+                initStatus = "Preparing assets..."
+                val filesDir = context.filesDir
+                val modelFile = File(filesDir, "kokoro-v1.0.fp16.onnx")
+                val voicesFile = File(filesDir, "voices-v1.0.bin")
+                val espeakDir = File(filesDir, "espeak-ng-data")
+
+                // 1. Copy files if missing
+                if (!modelFile.exists()) copyAsset(context, "kokoro-v1.0.fp16.onnx", modelFile)
+                if (!voicesFile.exists()) copyAsset(context, "voices-v1.0.bin", voicesFile)
+                
+                if (!File(espeakDir, "phondata").exists()) {
+                    initStatus = "Extracting data..."
+                    val zip = File(filesDir, "espeak-ng-data.zip")
+                    copyAsset(context, "espeak-ng-data.zip", zip)
+                    extractZipFile(zip, filesDir)
+                    zip.delete()
+                }
+
+                // 2. Pre-initialize engine into memory
+                initStatus = "Loading engine..."
+                val threadCount = Runtime.getRuntime().availableProcessors().coerceIn(1, 5)
+                val success = KokoroJNI.initialize(
+                    modelFile.absolutePath, 
+                    voicesFile.absolutePath, 
+                    filesDir.absolutePath, 
+                    threadCount
+                )
+                
+                if (success) {
+                    isEngineReady = true
+                    initStatus = "Ready"
+                } else {
+                    initStatus = "Engine Error"
+                }
+            } catch (e: Exception) {
+                initStatus = "Init Failed"
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Init error: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -79,7 +143,6 @@ fun SettingsScreen() {
                     .fillMaxWidth()
                     .clickable { expanded = !expanded }
             )
-            // Invisible box to catch clicks over the text field
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -109,10 +172,6 @@ fun SettingsScreen() {
         Text(text = "Default Speed Multiplier", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         
-        // Slider from 0.7 to 1.0 step 0.05
-        // Value range: 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0
-        // Steps = (1.0 - 0.7) / 0.05 = 6 steps
-        
         Text(
             text = String.format("%.2fx", speedMultiplier),
             style = MaterialTheme.typography.bodyLarge
@@ -121,7 +180,6 @@ fun SettingsScreen() {
         Slider(
             value = speedMultiplier,
             onValueChange = { newValue ->
-                // Snap to nearest 0.05
                 val snapped = (newValue * 20).roundToInt() / 20.0f
                 speedMultiplier = snapped
             },
@@ -129,7 +187,7 @@ fun SettingsScreen() {
                 prefs.edit().putFloat("speed_multiplier", speedMultiplier).apply()
             },
             valueRange = 0.7f..1.0f,
-            steps = 5, // (6 intervals - 1)
+            steps = 5,
             modifier = Modifier.fillMaxWidth()
         )
         Text(
@@ -137,10 +195,103 @@ fun SettingsScreen() {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        // --- Test Audio Button ---
+        Button(
+            onClick = {
+                if (!isSynthesizing && isEngineReady) {
+                    scope.launch {
+                        isSynthesizing = true
+                        try {
+                            playSample(context, selectedVoice, speedMultiplier)
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Playback failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                        } finally {
+                            isSynthesizing = false
+                        }
+                    }
+                }
+            },
+            enabled = isEngineReady && !isSynthesizing,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (isSynthesizing) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text("Synthesizing...")
+            } else if (!isEngineReady) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(initStatus)
+            } else {
+                Text("Play Sample Audio")
+            }
+        }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class) // For ExposedDropdownMenuDefaults
-@Composable
-fun Demo() {} // Placeholder to keep imports valid if unused
+private fun copyAsset(context: Context, name: String, dest: File) {
+    context.assets.open(name).use { input ->
+        FileOutputStream(dest).use { output ->
+            input.copyTo(output)
+        }
+    }
+}
 
+private fun extractZipFile(zipFile: File, destDir: File) {
+    ZipFile(zipFile).use { zip ->
+        zip.entries().asSequence().forEach { entry ->
+            val outFile = File(destDir, entry.name)
+            if (entry.isDirectory) {
+                outFile.mkdirs()
+            } else {
+                outFile.parentFile?.mkdirs()
+                zip.getInputStream(entry).use { input ->
+                    FileOutputStream(outFile).use { output ->
+                        input.copyTo(output)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun playSample(context: Context, voice: String, speed: Float) {
+    val text = "This is a sample of Kokoro TTS running natively on Android with optimized threading."
+    val samples = KokoroJNI.synthesize(text, voice, speed) ?: return
+
+    val sampleRate = 24000
+    val audioTrack = AudioTrack.Builder()
+        .setAudioAttributes(
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build()
+        )
+        .setAudioFormat(
+            AudioFormat.Builder()
+                .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
+                .setSampleRate(sampleRate)
+                .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                .build()
+        )
+        .setBufferSizeInBytes(samples.size * 4)
+        .setTransferMode(AudioTrack.MODE_STATIC)
+        .build()
+
+    audioTrack.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
+    audioTrack.play()
+}
+
+@Composable
+fun Demo() {}

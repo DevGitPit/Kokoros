@@ -4,7 +4,7 @@ use ort::session::Session;
 use ort::session::builder::SessionBuilder;
 
 pub trait OrtBase {
-    fn load_model(&mut self, model_path: String) -> Result<(), String> {
+    fn load_model(&mut self, model_path: String, intra_threads: usize) -> Result<(), String> {
         #[cfg(feature = "cuda")]
         let providers = [ep::CUDA::default().build()];
 
@@ -16,21 +16,16 @@ pub trait OrtBase {
 
         match SessionBuilder::new() {
             Ok(builder) => {
-                let mut builder = builder
-                    .with_execution_providers(providers)
-                    .map_err(|e| format!("Failed to build session: {}", e))?;
-
-                // Android-specific optimization for Snapdragon CPUs
-                // Set thread count via environment variable: KOKOROS_INTRA_THREADS=5
-                if let Ok(threads_str) = std::env::var("KOKOROS_INTRA_THREADS") {
-                    if let Ok(threads) = threads_str.parse::<usize>() {
-                        builder = builder
-                            .with_intra_threads(threads)
-                            .map_err(|e| format!("Failed to set threads: {}", e))?;
-                    }
-                }
-
                 let session = builder
+                    .with_execution_providers(providers)
+                    .map_err(|e| format!("Failed to build session: {}", e))?
+                    // inter_threads = 1 is usually best for mobile/ARM to avoid context switching overhead
+                    .with_inter_threads(1)
+                    .map_err(|e| format!("Failed to set inter threads: {}", e))?
+                    .with_intra_threads(intra_threads)
+                    .map_err(|e| format!("Failed to set intra threads: {}", e))?
+                    .with_optimization_level(ort::session::builder::GraphOptimizationLevel::Level3)
+                    .map_err(|e| format!("Failed to set optimization level: {}", e))?
                     .with_log_level(LogLevel::Warning)
                     .map_err(|e| format!("Failed to set log level: {}", e))?
                     .commit_from_file(model_path)

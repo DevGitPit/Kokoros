@@ -4,9 +4,16 @@
 // which causes linker errors when trying to link against libsonic and libpcaudio.
 
 fn main() {
-    // Only add these paths on Linux
-    if cfg!(target_os = "linux") {
-        // Add standard system library search paths
+    // Only add these paths on Linux (but not Android)
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    let target_arch = std::env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default();
+
+    if target_os == "android" {
+        println!("cargo:rustc-link-lib=log");
+    }
+
+    if target_os == "linux" && target_arch == "x86_64" {
+        // Add standard system library search paths for host Linux
         println!("cargo:rustc-link-search=/usr/lib");
         println!("cargo:rustc-link-search=/usr/lib/x86_64-linux-gnu");
         println!("cargo:rustc-link-search=/usr/lib64");

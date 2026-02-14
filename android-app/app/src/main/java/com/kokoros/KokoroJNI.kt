@@ -11,6 +11,7 @@ object KokoroJNI {
     // Load native libraries
     init {
         try {
+            System.loadLibrary("c++_shared")
             System.loadLibrary("onnxruntime")
             System.loadLibrary("kokoros_android")
             Log.i(TAG, "Native libraries loaded successfully.")
