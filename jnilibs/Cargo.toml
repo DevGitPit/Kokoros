@@ -1,6 +1,0 @@
-[workspace]
-members = [
-    "kokoros",
-    "kokoros-android"
-]
-resolver = "2"

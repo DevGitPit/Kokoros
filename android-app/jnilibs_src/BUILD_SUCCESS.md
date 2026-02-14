@@ -1,67 +1,46 @@
-# Kokoros Android JNI Build Success Report
+# Kokoros Android JNI Build Success Report (Optimized)
 
-**Date:** December 17, 2025
+**Date:** February 14, 2026
 **Target Architecture:** `aarch64-linux-android` (Arm64-v8a)
-**Build Environment:** Native Termux (on Android Device)
+**Build Environment:** Cross-compilation from Linux x86_64 using NDK 26.1.10909125.
 
 ## 1. Achievement
-Successfully compiled `libkokoros_android.so`, a JNI-compatible shared library for Android that embeds the Kokoro TTS engine. The library is linked against Bionic libc and is ready for inclusion in an Android APK.
+Successfully compiled an optimized version of `libkokoros_android.so` with **XNNPACK** support and high-performance threading for mobile processors. The library is fully integrated with the Android TTS service.
 
 ## 2. Key Challenges & Resolutions
 
 | Challenge | Root Cause | Resolution |
 | :--- | :--- | :--- |
-| **`ort-sys` Compilation** | `ort-sys` (v2.0.0-rc.10) build script failed to detect `android` target for cache directory logic. | **Patched `ort-sys`:** Modified `src/internal/dirs.rs` in the cargo registry to treat `android` like `linux`. Used `patch_deps.sh`. |
-| **`audiopus_sys` / `opus`** | `audiopus_sys` build script syntax error on Android. | **Removed Dependency:** Removed `opus` and `ogg` from `Cargo.toml`. The JNI lib returns raw PCM floats; Android handles encoding. |
-| **`openssl-sys`** | Cross-compiling OpenSSL is difficult; pkg-config failed to find it for the target. | **Switched to Rustls:** Replaced `reqwest` default features (OpenSSL) with `rustls-tls` in `Cargo.toml`. |
-| **`espeak-rs` / `espeak-ng`** | Build failed with "No such file or directory" for intonations. Caused by **path length buffer overflow** in `espeak-ng` C code. | **Moved Project:** Copied the project to a short path `~/k` in Termux to avoid the 160-char buffer limit in `espeak-ng`. |
-| **ONNX Runtime** | `ort` requires prebuilt binaries or full compilation. | **Used Local Binary:** Configured `ORT_STRATEGY=system` and pointed `ORT_LIB_LOCATION` to the user's existing `libonnxruntime.so` in Termux. |
+| **Cortex-A53 Linker Error** | `ld.lld: error: --fix-cortex-a53-843419 is only supported on AArch64 targets`. | **Fixed `build.rs`:** Discovered that the root `kokoros/build.rs` was adding host library paths (`/usr/lib/x86_64-linux-gnu`) to the search path, causing the linker to think it was building for x86_64. Limited these paths to `target_arch == "x86_64"`. |
+| **NDK 27 Incompatibility** | NDK 27 introduced stricter flag validation and path changes. | **Downgraded to NDK 26:** Used NDK `26.1.10909125` for more stable cross-compilation and predictable toolchain behavior. |
+| **Threading Performance** | Default ONNX threading causes high context switching on mobile. | **Mobile Optimization:** Set `inter_threads(1)` and enabled dynamic `intra_threads` (passed from Kotlin) with `Level3` optimizations. |
+| **CUDA Feature Overhead** | `cuda` feature was present in `Cargo.toml` but unused on Android. | **Cleaned Dependencies:** Removed `cuda` feature to reduce compile-time complexity. |
+| **Bindgen Sysroot** | `espeak-rs-sys` failed to find `stdio.h` during cross-compile. | **Sysroot Configuration:** Added `--sysroot` to `BINDGEN_EXTRA_CLANG_ARGS` in the build script. |
 
 ## 3. Final Build Configuration
 
-### Dependencies (`jnilibs/kokoros/Cargo.toml`)
-*   **Removed:** `opus`, `ogg`
-*   **Modified:** `reqwest` uses `default-features = false, features = ["rustls-tls", "json"]`
-*   **ORT:** `version = "2.0.0-rc.9"` (Patched locally via `patch_deps.sh`)
+### Dependencies (`android-app/jnilibs_src/kokoros/Cargo.toml`)
+*   **Features:** `default = ["cpu"]`, `xnnpack = ["ort/xnnpack"]`.
+*   **ORT:** `version = "2.0.0-rc.11"` (Patched `ort-sys` for Android cache dir).
 
-### Build Script (`build_jni_final.sh`)
-*   Sets `ORT_STRATEGY=system`.
-*   Sets `ORT_LIB_LOCATION` to the local Android `libonnxruntime.so`.
-*   Runs `cargo clean` for dependencies to ensure clean environment.
-*   Builds with `cargo build --release` (Native Termux defaults to Android host).
+### Build Script (`build_android.sh`)
+*   Uses **NDK 26**.
+*   Sets `ORT_STRATEGY=system` and points to extracted AAR headers/libs.
+*   Builds with `cargo build --release --target aarch64-linux-android --features xnnpack`.
 
 ## 4. Reproduction Steps
 
-1.  **Environment:** Native Termux on Android `aarch64`.
-2.  **Prerequisites:**
-    *   `pkg install rust cmake clang pkg-config`
-    *   Existing `libonnxruntime.so` (Android build) at a known path.
-3.  **Setup:**
-    *   Copy `jnilibs` folder to a **short path** (e.g., `~/k`).
-    *   Ensure `patch_deps.sh` has run at least once to fix `ort-sys` in `~/.cargo/registry`.
-4.  **Build:**
+1.  **Environment:** Linux x86_64 with NDK 26 and Rust `aarch64-linux-android` target.
+2.  **Setup:**
     ```bash
-    cd ~/k
-    ./build_jni_final.sh
+    cd android-app/jnilibs_src
+    ./build_android.sh
     ```
-5.  **Output:**
-    *   `~/k/output/libkokoros_android.so` (The JNI Lib)
+3.  **Output:**
+    *   `android-app/jnilibs_src/output/libkokoros_android.so`
 
-## 5. Android Integration Guide
+## 5. Android Integration
 
-1.  **Copy Libraries:**
-    *   Place `libkokoros_android.so` and `libonnxruntime.so` into your Android project at:
-        `app/src/main/jniLibs/arm64-v8a/`
-2.  **Load in Java/Kotlin:**
-    ```kotlin
-    companion object {
-        init {
-            System.loadLibrary("onnxruntime")
-            System.loadLibrary("kokoros_android")
-        }
-    }
-    ```
-3.  **API:**
-    *   `init(modelPath, voicesPath, threads)` -> Returns pointer (Long)
-    *   `speak_raw(pointer, text, voice, speed)` -> Returns FloatArray
-    *   `close(pointer)` -> Void
+1.  **Libraries:** Place `libkokoros_android.so` and `libonnxruntime.so` (from AAR) in `app/src/main/jniLibs/arm64-v8a/`.
+2.  **Model:** Uses `kokoro-v1.0.fp16.onnx` for optimal mobile performance.
+3.  **Threading:** `intra_threads` is dynamically calculated based on CPU cores (Prime + Performance cores recommended).
