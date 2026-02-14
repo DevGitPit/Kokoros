@@ -45,6 +45,13 @@ object KokoroJNI {
      */
     private external fun close(enginePtr: Long)
 
+    /**
+     * Gets the current execution provider (e.g., "CPU", "XNNPACK").
+     * @param enginePtr The pointer to the native engine instance.
+     * @return A string describing the backend.
+     */
+    private external fun get_backend_info(enginePtr: Long): String?
+
     // --- High-level Kotlin API ---
 
     fun initialize(modelPath: String, voicesPath: String, espeakDataPath: String, intraThreads: Int): Boolean {
@@ -60,6 +67,11 @@ object KokoroJNI {
             return null
         }
         return speak_raw(enginePtr, text, voice, speed)
+    }
+
+    fun getBackendInfo(): String {
+        if (enginePtr == 0L) return "Unknown"
+        return get_backend_info(enginePtr) ?: "Unknown"
     }
 
     fun shutdown() {

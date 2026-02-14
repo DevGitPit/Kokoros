@@ -1050,6 +1050,12 @@ impl TTSKoko {
         voices.sort();
         voices
     }
+
+    pub fn get_backend_info(&self) -> String {
+        use crate::onn::ort_base::OrtBase;
+        let model = self.model.lock().unwrap();
+        model.get_execution_provider().to_string()
+    }
 }
 
 impl TTSKokoParallel {

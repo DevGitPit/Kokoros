@@ -10,6 +10,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -54,6 +56,8 @@ fun SettingsScreen() {
     // State management
     var selectedVoice by remember { mutableStateOf(prefs.getString("voice_skin", "af_sky") ?: "af_sky") }
     var speedMultiplier by remember { mutableFloatStateOf(prefs.getFloat("speed_multiplier", 1.0f)) }
+    var threadCount by remember { mutableIntStateOf(prefs.getInt("thread_count", Runtime.getRuntime().availableProcessors().coerceIn(1, 5))) }
+    var backendInfo by remember { mutableStateOf("Loading...") }
     var isSynthesizing by remember { mutableStateOf(false) }
     var isEngineReady by remember { mutableStateOf(false) }
     var initStatus by remember { mutableStateOf("Checking assets...") }
@@ -64,6 +68,8 @@ fun SettingsScreen() {
         "bf_emma", "bf_isabella",
         "bm_george", "bm_lewis"
     )
+
+    val threadOptions = listOf(1, 2, 3, 4, 5)
 
     // Startup Initialization
     LaunchedEffect(Unit) {
@@ -89,7 +95,6 @@ fun SettingsScreen() {
 
                 // 2. Pre-initialize engine into memory
                 initStatus = "Loading engine..."
-                val threadCount = Runtime.getRuntime().availableProcessors().coerceIn(1, 5)
                 val success = KokoroJNI.initialize(
                     modelFile.absolutePath, 
                     voicesFile.absolutePath, 
@@ -100,6 +105,7 @@ fun SettingsScreen() {
                 if (success) {
                     isEngineReady = true
                     initStatus = "Ready"
+                    backendInfo = KokoroJNI.getBackendInfo()
                 } else {
                     initStatus = "Engine Error"
                 }
@@ -107,6 +113,39 @@ fun SettingsScreen() {
                 initStatus = "Init Failed"
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Init error: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    // Helper to re-initialize engine
+    fun updateThreads(newCount: Int) {
+        threadCount = newCount
+        prefs.edit().putInt("thread_count", newCount).apply()
+        
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                isEngineReady = false
+                initStatus = "Updating threads..."
+                KokoroJNI.shutdown()
+                
+                val filesDir = context.filesDir
+                val modelFile = File(filesDir, "kokoro-v1.0.fp16.onnx")
+                val voicesFile = File(filesDir, "voices-v1.0.bin")
+                
+                val success = KokoroJNI.initialize(
+                    modelFile.absolutePath, 
+                    voicesFile.absolutePath, 
+                    filesDir.absolutePath, 
+                    newCount
+                )
+                
+                if (success) {
+                    isEngineReady = true
+                    initStatus = "Ready"
+                    backendInfo = KokoroJNI.getBackendInfo()
+                } else {
+                    initStatus = "Engine Error"
                 }
             }
         }
@@ -163,6 +202,76 @@ fun SettingsScreen() {
                         }
                     )
                 }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- Threading Selection ---
+        Text(text = "Inference Threads", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        var threadExpanded by remember { mutableStateOf(false) }
+        
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = threadCount.toString(),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Threads") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = threadExpanded) },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { threadExpanded = !threadExpanded }
+            )
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clickable { threadExpanded = !threadExpanded }
+            )
+            
+            DropdownMenu(
+                expanded = threadExpanded,
+                onDismissRequest = { threadExpanded = false }
+            ) {
+                threadOptions.forEach { count ->
+                    DropdownMenuItem(
+                        text = { Text(count.toString()) },
+                        onClick = {
+                            if (count != threadCount) {
+                                updateThreads(count)
+                            }
+                            threadExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+        Text(
+            text = "Recommended: 1-2 for most phones, 4-5 for high-end Snapdragon.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- Backend Info ---
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Active Backend: ", style = MaterialTheme.typography.titleSmall)
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(
+                    text = backendInfo,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
             }
         }
 

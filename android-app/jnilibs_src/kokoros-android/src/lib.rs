@@ -1,5 +1,5 @@
 use jni::objects::{JClass, JString};
-use jni::sys::{jfloatArray, jint, jlong};
+use jni::sys::{jfloatArray, jint, jlong, jstring};
 use jni::JNIEnv;
 use kokoros::tts::koko::{InitConfig, TTSKoko};
 use tokio::runtime::Builder;
@@ -124,6 +124,25 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_speak_1raw(
             error!("TTS Error: {}", e);
             std::ptr::null_mut()
         }
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_com_kokoros_KokoroJNI_get_1backend_1info(
+    mut env: JNIEnv,
+    _class: JClass,
+    engine_ptr: jlong,
+) -> jstring {
+    if engine_ptr == 0 {
+        return std::ptr::null_mut();
+    }
+
+    let engine = unsafe { &mut *(engine_ptr as *mut KokoroEngine) };
+    let info = engine.tts.get_backend_info();
+    
+    match env.new_string(info) {
+        Ok(s) => s.into_raw(),
+        Err(_) => std::ptr::null_mut(),
     }
 }
 
