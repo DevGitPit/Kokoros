@@ -8,18 +8,34 @@ pub trait OrtBase {
         #[cfg(feature = "cuda")]
         let providers = [ep::CUDA::default().build()];
 
-        #[cfg(not(feature = "cuda"))]
+        #[cfg(all(feature = "xnnpack", not(feature = "cuda")))]
+        let providers = [ep::XNNPACK::default().build()];
+
+        #[cfg(all(not(feature = "cuda"), not(feature = "xnnpack")))]
         let providers = [ep::CPU::default().build()];
 
         match SessionBuilder::new() {
             Ok(builder) => {
-                let session = builder
+                let mut builder = builder
                     .with_execution_providers(providers)
-                    .map_err(|e| format!("Failed to build session: {}", e))?
+                    .map_err(|e| format!("Failed to build session: {}", e))?;
+
+                // Android-specific optimization for Snapdragon CPUs
+                // Set thread count via environment variable: KOKOROS_INTRA_THREADS=5
+                if let Ok(threads_str) = std::env::var("KOKOROS_INTRA_THREADS") {
+                    if let Ok(threads) = threads_str.parse::<usize>() {
+                        builder = builder
+                            .with_intra_threads(threads)
+                            .map_err(|e| format!("Failed to set threads: {}", e))?;
+                    }
+                }
+
+                let session = builder
                     .with_log_level(LogLevel::Warning)
                     .map_err(|e| format!("Failed to set log level: {}", e))?
                     .commit_from_file(model_path)
                     .map_err(|e| format!("Failed to commit from file: {}", e))?;
+                    
                 self.set_sess(session);
                 Ok(())
             }
@@ -37,11 +53,14 @@ pub trait OrtBase {
             for output in session.outputs() {
                 eprintln!("  - {}", output.name());
             }
-
+            
             #[cfg(feature = "cuda")]
             eprintln!("Configured with: CUDA execution provider");
-
-            #[cfg(not(feature = "cuda"))]
+            
+            #[cfg(all(feature = "xnnpack", not(feature = "cuda")))]
+            eprintln!("Configured with: XNNPACK execution provider");
+            
+            #[cfg(all(not(feature = "cuda"), not(feature = "xnnpack")))]
             eprintln!("Configured with: CPU execution provider");
         } else {
             eprintln!("Session is not initialized.");

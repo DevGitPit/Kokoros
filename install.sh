@@ -137,6 +137,24 @@ case $choice in
         ;;
 esac
 
+# XNNPACK-specific thread optimization prompt
+XNNPACK_THREADS=""
+if [ "$BUILD_TYPE" == "xnnpack" ]; then
+    echo ""
+    echo -e "${YELLOW}XNNPACK Thread Optimization:${NC}"
+    echo "For optimal performance on ARM devices, set thread count based on your CPU:"
+    echo -e "  ${GREEN}5${NC} - High-end SoCs (e.g., Snapdragon 7+ Gen 3: 1 Prime + 4 Performance cores)"
+    echo -e "  ${GREEN}4${NC} - Standard 4-big-core setups (most Android devices)"
+    echo -e "  ${YELLOW}Press Enter to skip${NC} (use ONNX Runtime default)"
+    echo ""
+    read -p "Thread count [leave empty for default]: " thread_input
+    
+    if [ -n "$thread_input" ]; then
+        XNNPACK_THREADS="$thread_input"
+        echo -e "${GREEN}Will optimize for $XNNPACK_THREADS threads${NC}"
+    fi
+fi
+
 # CUDA-specific setup (only on x86_64)
 if [ "$BUILD_TYPE" == "cuda" ]; then
     echo ""
@@ -292,6 +310,23 @@ if [ "$IS_TERMUX" = true ]; then
             fi
         done
     fi
+    
+    # Create XNNPACK wrapper in Termux if thread optimization was set
+    if [ "$BUILD_TYPE" == "xnnpack" ] && [ -n "$XNNPACK_THREADS" ]; then
+        echo ""
+        echo -e "${BLUE}Creating optimized XNNPACK wrapper...${NC}"
+        
+        cat > "$PREFIX/bin/koko-xnnpack" << EOF
+#!/bin/bash
+# XNNPACK wrapper with thread optimization
+export KOKOROS_INTRA_THREADS=$XNNPACK_THREADS
+exec "$PREFIX/bin/koko" "\$@"
+EOF
+        
+        chmod +x "$PREFIX/bin/koko-xnnpack"
+        echo -e "${GREEN}✓ Created koko-xnnpack wrapper (optimized for $XNNPACK_THREADS threads)${NC}"
+        WSL_WRAPPER_CREATED=true
+    fi
 else
     # Regular Linux (PC - both x86_64 and ARM)
     read -p "Install koko to $KOKO_BIN_DEST? This requires sudo. [Y/n]: " install_bin
@@ -328,11 +363,28 @@ EOF
             WSL_WRAPPER_CREATED=true
         fi
         
+        # XNNPACK wrapper for system-wide install
+        if [ "$BUILD_TYPE" == "xnnpack" ] && [ -n "$XNNPACK_THREADS" ]; then
+            echo ""
+            echo -e "${BLUE}Creating optimized XNNPACK wrapper...${NC}"
+            
+            sudo tee /usr/local/bin/koko-xnnpack > /dev/null << EOF
+#!/bin/bash
+# XNNPACK wrapper with thread optimization
+export KOKOROS_INTRA_THREADS=$XNNPACK_THREADS
+exec /usr/local/bin/koko "\$@"
+EOF
+            
+            sudo chmod +x /usr/local/bin/koko-xnnpack
+            echo -e "${GREEN}✓ Created koko-xnnpack wrapper (optimized for $XNNPACK_THREADS threads)${NC}"
+            WSL_WRAPPER_CREATED=true
+        fi
+        
         echo -e "${GREEN}✓ Installation completed successfully!${NC}"
     else
         echo -e "${YELLOW}Skipping installation. Binary available at: $KOKO_BIN_SRC${NC}"
         
-        # Even if skipping install, create a local WSL wrapper for testing
+        # Even if skipping install, create local wrappers for testing
         if [ "$BUILD_TYPE" == "cuda" ] && grep -qi "microsoft\|wsl" /proc/version 2>/dev/null; then
             echo ""
             echo -e "${BLUE}WSL2 detected - creating local wrapper script...${NC}"
@@ -347,6 +399,22 @@ EOF
             chmod +x koko-wsl.sh
             echo -e "${GREEN}✓ Created ./koko-wsl.sh wrapper${NC}"
             KOKO_BIN_DEST="./koko-wsl.sh"
+            WSL_WRAPPER_CREATED=true
+        elif [ "$BUILD_TYPE" == "xnnpack" ] && [ -n "$XNNPACK_THREADS" ]; then
+            # Create XNNPACK wrapper with thread optimization
+            echo ""
+            echo -e "${BLUE}Creating optimized XNNPACK wrapper...${NC}"
+            
+            cat > koko-xnnpack.sh << EOF
+#!/bin/bash
+# XNNPACK wrapper with thread optimization
+export KOKOROS_INTRA_THREADS=$XNNPACK_THREADS
+exec "\$(dirname "\$0")/target/release/koko" "\$@"
+EOF
+            
+            chmod +x koko-xnnpack.sh
+            echo -e "${GREEN}✓ Created ./koko-xnnpack.sh wrapper (optimized for $XNNPACK_THREADS threads)${NC}"
+            KOKO_BIN_DEST="./koko-xnnpack.sh"
             WSL_WRAPPER_CREATED=true
         else
             KOKO_BIN_DEST="$KOKO_BIN_SRC"
@@ -411,6 +479,21 @@ if [ "$BUILD_TYPE" == "xnnpack" ]; then
     echo -e "${YELLOW}XNNPACK Notes:${NC}"
     echo "- Optimized for ARM CPU operations"
     echo "- Should provide better performance than default CPU build"
+    
+    if [ "$WSL_WRAPPER_CREATED" = true ] || [ -n "$XNNPACK_THREADS" ]; then
+        echo ""
+        echo -e "${GREEN}XNNPACK Optimization Active:${NC}"
+        if [[ "$KOKO_BIN_DEST" == *"xnnpack"* ]]; then
+            if [ "$IS_TERMUX" = true ]; then
+                echo -e "- Use the optimized command: ${GREEN}koko-xnnpack${NC}"
+            else
+                echo -e "- Use the optimized wrapper: ${GREEN}./koko-xnnpack.sh openai${NC}"
+                echo -e "- Or system-wide: ${GREEN}koko-xnnpack openai${NC}"
+            fi
+            echo -e "- Configured for ${GREEN}$XNNPACK_THREADS threads${NC}"
+        fi
+    fi
+    
     if [ "$IS_TERMUX" = true ]; then
         echo "- Works best in PRoot environment on mobile devices"
     fi
