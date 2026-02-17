@@ -26,4 +26,5 @@ ogg = "0.9"
 [features]
 default = ["cpu"]
 cpu = []
+cuda = ["ort/cuda"]
 xnnpack = ["ort/xnnpack"]

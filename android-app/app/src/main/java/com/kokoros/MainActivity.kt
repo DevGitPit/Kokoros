@@ -56,7 +56,8 @@ fun SettingsScreen() {
     // State management
     var selectedVoice by remember { mutableStateOf(prefs.getString("voice_skin", "af_sky") ?: "af_sky") }
     var speedMultiplier by remember { mutableFloatStateOf(prefs.getFloat("speed_multiplier", 1.0f)) }
-    var threadCount by remember { mutableIntStateOf(prefs.getInt("thread_count", Runtime.getRuntime().availableProcessors().coerceIn(1, 5))) }
+    var ortThreads by remember { mutableIntStateOf(prefs.getInt("ort_threads", 4)) }
+    var xnnpackThreads by remember { mutableIntStateOf(prefs.getInt("xnnpack_threads", 1)) }
     var backendInfo by remember { mutableStateOf("Loading...") }
     var isSynthesizing by remember { mutableStateOf(false) }
     var isEngineReady by remember { mutableStateOf(false) }
@@ -69,7 +70,7 @@ fun SettingsScreen() {
         "bm_george", "bm_lewis"
     )
 
-    val threadOptions = listOf(1, 2, 3, 4, 5)
+    val threadOptions = listOf(1, 2, 3, 4, 6, 8)
 
     // Startup Initialization
     LaunchedEffect(Unit) {
@@ -77,13 +78,16 @@ fun SettingsScreen() {
             try {
                 initStatus = "Preparing assets..."
                 val filesDir = context.filesDir
-                val modelFile = File(filesDir, "kokoro-v1.0.fp16.onnx")
-                val voicesFile = File(filesDir, "voices-v1.0.bin")
+                val modelDir = File(filesDir, "model")
+                if (!modelDir.exists()) modelDir.mkdirs()
+                
+                val modelFile = File(modelDir, "model.onnx")
+                val voicesFile = File(modelDir, "voices.bin")
                 val espeakDir = File(filesDir, "espeak-ng-data")
 
                 // 1. Copy files if missing
-                if (!modelFile.exists()) copyAsset(context, "kokoro-v1.0.fp16.onnx", modelFile)
-                if (!voicesFile.exists()) copyAsset(context, "voices-v1.0.bin", voicesFile)
+                if (!modelFile.exists()) copyAsset(context, "model/model.onnx", modelFile)
+                if (!voicesFile.exists()) copyAsset(context, "model/voices.bin", voicesFile)
                 
                 if (!File(espeakDir, "phondata").exists()) {
                     initStatus = "Extracting data..."
@@ -99,7 +103,8 @@ fun SettingsScreen() {
                     modelFile.absolutePath, 
                     voicesFile.absolutePath, 
                     filesDir.absolutePath, 
-                    threadCount
+                    ortThreads,
+                    xnnpackThreads
                 )
                 
                 if (success) {
@@ -119,9 +124,13 @@ fun SettingsScreen() {
     }
 
     // Helper to re-initialize engine
-    fun updateThreads(newCount: Int) {
-        threadCount = newCount
-        prefs.edit().putInt("thread_count", newCount).apply()
+    fun updateThreads(newOrt: Int, newXnn: Int) {
+        ortThreads = newOrt
+        xnnpackThreads = newXnn
+        prefs.edit()
+            .putInt("ort_threads", newOrt)
+            .putInt("xnnpack_threads", newXnn)
+            .apply()
         
         scope.launch {
             withContext(Dispatchers.IO) {
@@ -130,14 +139,16 @@ fun SettingsScreen() {
                 KokoroJNI.shutdown()
                 
                 val filesDir = context.filesDir
-                val modelFile = File(filesDir, "kokoro-v1.0.fp16.onnx")
-                val voicesFile = File(filesDir, "voices-v1.0.bin")
+                val modelDir = File(filesDir, "model")
+                val modelFile = File(modelDir, "model.onnx")
+                val voicesFile = File(modelDir, "voices.bin")
                 
                 val success = KokoroJNI.initialize(
                     modelFile.absolutePath, 
                     voicesFile.absolutePath, 
                     filesDir.absolutePath, 
-                    newCount
+                    newOrt,
+                    newXnn
                 )
                 
                 if (success) {
@@ -208,48 +219,67 @@ fun SettingsScreen() {
         Spacer(modifier = Modifier.height(24.dp))
 
         // --- Threading Selection ---
-        Text(text = "Inference Threads", style = MaterialTheme.typography.titleMedium)
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        var threadExpanded by remember { mutableStateOf(false) }
-        
-        Box(modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(
-                value = threadCount.toString(),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Threads") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = threadExpanded) },
-                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { threadExpanded = !threadExpanded }
-            )
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .clickable { threadExpanded = !threadExpanded }
-            )
-            
-            DropdownMenu(
-                expanded = threadExpanded,
-                onDismissRequest = { threadExpanded = false }
-            ) {
-                threadOptions.forEach { count ->
-                    DropdownMenuItem(
-                        text = { Text(count.toString()) },
-                        onClick = {
-                            if (count != threadCount) {
-                                updateThreads(count)
-                            }
-                            threadExpanded = false
-                        }
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "ORT Threads", style = MaterialTheme.typography.titleSmall)
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                var ortExpanded by remember { mutableStateOf(false) }
+                Box {
+                    OutlinedTextField(
+                        value = ortThreads.toString(),
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = ortExpanded) },
+                        modifier = Modifier.clickable { ortExpanded = !ortExpanded }
                     )
+                    Box(modifier = Modifier.matchParentSize().clickable { ortExpanded = !ortExpanded })
+                    DropdownMenu(expanded = ortExpanded, onDismissRequest = { ortExpanded = false }) {
+                        threadOptions.forEach { count ->
+                            DropdownMenuItem(
+                                text = { Text(count.toString()) },
+                                onClick = {
+                                    if (count != ortThreads) updateThreads(count, xnnpackThreads)
+                                    ortExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "XNNPACK Threads", style = MaterialTheme.typography.titleSmall)
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                var xnnExpanded by remember { mutableStateOf(false) }
+                Box {
+                    OutlinedTextField(
+                        value = xnnpackThreads.toString(),
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = xnnExpanded) },
+                        modifier = Modifier.clickable { xnnExpanded = !xnnExpanded }
+                    )
+                    Box(modifier = Modifier.matchParentSize().clickable { xnnExpanded = !xnnExpanded })
+                    DropdownMenu(expanded = xnnExpanded, onDismissRequest = { xnnExpanded = false }) {
+                        threadOptions.forEach { count ->
+                            DropdownMenuItem(
+                                text = { Text(count.toString()) },
+                                onClick = {
+                                    if (count != xnnpackThreads) updateThreads(ortThreads, count)
+                                    xnnExpanded = false
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
         Text(
-            text = "Recommended: 1-2 for most phones, 4-5 for high-end Snapdragon.",
+            text = "Recommended: ORT 4, XNNPACK 1 for balanced power/speed.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

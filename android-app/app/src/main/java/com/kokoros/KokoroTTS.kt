@@ -41,13 +41,16 @@ class KokoroTTS : TextToSpeechService() {
             if (assetsCopied) {
                 // Initialize TTS engine after assets are ready
                 val filesDir = applicationContext.filesDir
-                modelPath = File(filesDir, MODEL_ONNX_FP16).absolutePath
-                voicesPath = File(filesDir, VOICES_BIN).absolutePath
+                val modelDir = File(filesDir, "model")
+                modelPath = File(modelDir, MODEL_ONNX).absolutePath
+                voicesPath = File(modelDir, VOICES_BIN).absolutePath
                 val espeakParentPath = filesDir.absolutePath // espeak-ng expects path to parent of 'espeak-ng-data'
 
-                val threads = Runtime.getRuntime().availableProcessors().coerceIn(1, 8)
-                val threadCount = if (threads >= 5) 5 else threads
-                ttsInitialized = KokoroJNI.initialize(modelPath!!, voicesPath!!, espeakParentPath, threadCount)
+                val prefs = applicationContext.getSharedPreferences("KokoroPrefs", Context.MODE_PRIVATE)
+                val ortThreads = prefs.getInt("ort_threads", 4)
+                val xnnpackThreads = prefs.getInt("xnnpack_threads", 1)
+                
+                ttsInitialized = KokoroJNI.initialize(modelPath!!, voicesPath!!, espeakParentPath, ortThreads, xnnpackThreads)
                 if (ttsInitialized) {
                     Log.i(TAG, "Kokoro TTS engine initialized successfully.")
                 } else {
@@ -257,9 +260,12 @@ class KokoroTTS : TextToSpeechService() {
         return withContext(Dispatchers.IO) {
             try {
                 val filesDir = context.filesDir
+                val modelDir = File(filesDir, "model")
+                if (!modelDir.exists()) modelDir.mkdirs()
+
                 val assetManager = context.assets
-                copyAssetFile(assetManager, MODEL_ONNX_FP16, File(filesDir, MODEL_ONNX_FP16))
-                copyAssetFile(assetManager, VOICES_BIN, File(filesDir, VOICES_BIN))
+                copyAssetFile(assetManager, "model/" + MODEL_ONNX, File(modelDir, MODEL_ONNX))
+                copyAssetFile(assetManager, "model/" + VOICES_BIN, File(modelDir, VOICES_BIN))
                 
                 val espeakDataDir = File(filesDir, "espeak-ng-data")
                 val phondataFile = File(espeakDataDir, "phondata")
@@ -320,7 +326,7 @@ class KokoroTTS : TextToSpeechService() {
     }
 
     companion object {
-        private const val MODEL_ONNX_FP16 = "kokoro-v1.0.fp16.onnx"
-        private const val VOICES_BIN = "voices-v1.0.bin"
+        private const val MODEL_ONNX = "model.onnx"
+        private const val VOICES_BIN = "voices.bin"
     }
 }
