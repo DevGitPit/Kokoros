@@ -44,6 +44,7 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_init(
     };
 
     // Set ESPEAK_DATA_PATH so libespeak-ng can find phoneme data
+    info!("Setting ESPEAK_DATA_PATH to: {}", &espeak_data_path);
     unsafe {
         std::env::set_var("ESPEAK_DATA_PATH", &espeak_data_path);
     }
@@ -77,6 +78,7 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_speak_1raw(
     engine_ptr: jlong,
     text: JString,
     voice: JString,
+    language: JString,
     speed: f32,
 ) -> jfloatArray {
     if engine_ptr == 0 {
@@ -95,12 +97,17 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_speak_1raw(
         Err(_) => return std::ptr::null_mut(),
     };
 
-    info!("JNI speak_raw: voice={}, speed={}", voice_str, speed);
+    let lang_str: String = match env.get_string(&language) {
+        Ok(s) => s.into(),
+        Err(_) => "en-us".to_string(),
+    };
+
+    info!("JNI speak_raw: voice={}, lang={}, speed={}", voice_str, lang_str, speed);
 
     let audio_result = engine.rt.block_on(async {
         engine.tts.tts_raw_audio(
             &text_str,
-            "en-us",
+            &lang_str,
             &voice_str,
             speed,
             None,

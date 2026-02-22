@@ -37,7 +37,7 @@ object KokoroJNI {
      * @param speed The speech speed multiplier (e.g., 1.0).
      * @return A float array containing the raw PCM samples, or null if synthesis fails.
      */
-    private external fun speak_raw(enginePtr: Long, text: String, voice: String, speed: Float): FloatArray?
+    private external fun speak_raw(enginePtr: Long, text: String, voice: String, language: String, speed: Float): FloatArray?
 
     /**
      * Closes and releases the native Kokoros TTS engine instance.
@@ -61,12 +61,12 @@ object KokoroJNI {
         return enginePtr != 0L
     }
 
-    fun synthesize(text: String, voice: String, speed: Float): FloatArray? {
+    fun synthesize(text: String, voice: String, language: String, speed: Float): FloatArray? {
         if (enginePtr == 0L) {
             Log.e(TAG, "Engine not initialized. Call initialize() first.")
             return null
         }
-        return speak_raw(enginePtr, text, voice, speed)
+        return speak_raw(enginePtr, text, voice, language, speed)
     }
 
     fun getBackendInfo(): String {

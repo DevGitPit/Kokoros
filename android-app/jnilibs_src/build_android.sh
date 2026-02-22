@@ -43,12 +43,24 @@ export RUSTFLAGS="-L $ONNX_PATH -l onnxruntime -l log -l atomic -l c++_shared -C
 
 cargo build --release --target aarch64-linux-android --features xnnpack
 
-# 5. Copy Output
+# 5. Copy Output and Strip
 mkdir -p "$OUTPUT_DIR"
 TARGET_ARTIFACT="$BASE_DIR/target/aarch64-linux-android/release/$LIB_NAME"
 
 if [ -f "$TARGET_ARTIFACT" ]; then
     cp "$TARGET_ARTIFACT" "$OUTPUT_DIR/$LIB_NAME"
+    
+    # Strip binary for size
+    STRIP="$TOOLCHAIN/llvm-strip"
+    if [ -f "$STRIP" ]; then
+        echo "Stripping binary..."
+        "$STRIP" "$OUTPUT_DIR/$LIB_NAME"
+    fi
+    
+    # Copy to android app jniLibs
+    mkdir -p "$BASE_DIR/../app/src/main/jniLibs/arm64-v8a"
+    cp "$OUTPUT_DIR/$LIB_NAME" "$BASE_DIR/../app/src/main/jniLibs/arm64-v8a/$LIB_NAME"
+    
     echo "=== Build Successful ==="
 else
     echo "=== Build Failed ==="

@@ -105,6 +105,102 @@ impl Default for InitConfig {
     }
 }
 
+fn normalize_phonemes(ps: &str, lan: &str, voice: &str) -> String {
+    let original_ps = ps.to_string();
+    
+    // Check if eSpeak returned a description instead of phonemes
+    let mut ps = if ps.contains("dʒˌæpəniːz lˈɛtɚ") || ps.contains("tʃaɪnˈiːz lˈɛtɚ") {
+        log::warn!("ESPEAK: Detected fallback description for {}, dictionaries might be missing Kanji support.", lan);
+        ps.to_string() 
+    } else {
+        ps.to_string()
+    };
+
+    // 1. Language-specific pre-processing
+    if lan == "ja" {
+        ps = ps.replace("ʦ", "ts")
+               .replace("ʨ", "ch")
+               .replace("ʥ", "j")
+               .replace("r", "ɹ");
+    } else if lan == "cmn" || lan == "zh" {
+        // Map eSpeak Chinese tone digits and symbols
+        ps = ps.replace("1", "→")
+               .replace("2", "↗")
+               .replace("3", "↓")
+               .replace("4", "↘")
+               .replace("5", "")
+               .replace("˥", "→")
+               .replace("˧˥", "↗")
+               .replace("˧˩˧", "↓")
+               .replace("˥˩", "↘");
+        
+        // Fix accented characters produced by eSpeak cmn that aren't in VOCAB
+        ps = ps.replace("ò", "o")
+               .replace("ā", "a")
+               .replace("á", "a")
+               .replace("ǎ", "a")
+               .replace("à", "a")
+               .replace("ē", "e")
+               .replace("é", "e")
+               .replace("ě", "e")
+               .replace("è", "e")
+               .replace("ī", "i")
+               .replace("í", "i")
+               .replace("ǐ", "i")
+               .replace("ì", "i")
+               .replace("ō", "o")
+               .replace("ó", "o")
+               .replace("ǒ", "o")
+               .replace("ū", "u")
+               .replace("ú", "u")
+               .replace("ǔ", "u")
+               .replace("ù", "u");
+    } else if lan == "pt-br" || lan == "pt" {
+        // Portuguese normalization: Handle nasals and specific eSpeak IPA that might not be in VOCAB
+        // Map common Portuguese IPA characters to Kokoro tokens
+        ps = ps.replace("ã", "ɐ") // nasal a -> schwa or similar
+               .replace("õ", "o")
+               .replace("ê", "e")
+               .replace("í", "i")
+               .replace("ó", "o")
+               .replace("ú", "u")
+               .replace("á", "a");
+    }
+
+    // 2. Standard Kokoro replacements
+    ps = ps
+        .replace("kəkˈoːɹoʊ", "kˈoʊkəɹoʊ")
+        .replace("kəkˈɔːɹəʊ", "kˈəʊkəɹəʊ")
+        .replace("ʲ", "j")
+        .replace("r", "ɹ")
+        .replace("x", "k")
+        .replace("ɬ", "l")
+        .replace("ʧ", "ch")
+        .replace("ʤ", "j");
+
+    // 3. Region-specific English fixes (apply British fixes if voice starts with bf or bm)
+    if voice.starts_with("bf") || voice.starts_with("bm") {
+        ps = ps.replace("eə", "ɛː")
+               .replace("iə", "ɪə")
+               .replace("ɜː", "ɝ")
+               .replace("oʊ", "əʊ"); // Map US 'go' to UK 'go'
+    } else {
+        ps = ps.replace("ɜː", "ɝ");
+    }
+
+    let normalized_ps = ps.clone();
+
+    // 4. Filter by vocabulary
+    let final_ps: String = ps.chars().filter(|&c| crate::tts::vocab::VOCAB.contains_key(&c)).collect();
+    
+    log::info!("KOKORO_DEBUG [{}|{}]:", lan, voice);
+    log::info!("  - Original:   {}", original_ps);
+    log::info!("  - Normalized: {}", normalized_ps);
+    log::info!("  - Final:      {}", final_ps);
+    
+    final_ps
+}
+
 impl TTSKoko {
     pub async fn new(model_path: &str, voices_path: &str) -> Self {
         Self::from_config(model_path, voices_path, InitConfig::default()).await
@@ -152,7 +248,7 @@ impl TTSKoko {
         chunk_number_start: Option<usize>,
         mut mode: ExecutionMode,
     ) -> Result<Option<(Vec<f32>, Vec<WordAlignment>)>, Box<dyn std::error::Error>> {
-        let chunks = self.split_text_into_chunks(txt, 500, lan);
+        let chunks = self.split_text_into_chunks(txt, 500, lan, style_name);
 
         let start_chunk_num = chunk_number_start.unwrap_or(0);
 
@@ -172,10 +268,10 @@ impl TTSKoko {
             };
 
             let (mut tokens, word_map) = if use_alignment {
-                self.tokenize_with_alignment(chunk, lan)
+                self.tokenize_with_alignment(chunk, lan, style_name)
             } else {
                 // Fast path for audio-only models: single eSpeak pass, no per-item calls
-                self.tokenize_full_no_alignment(chunk, lan)
+                self.tokenize_full_no_alignment(chunk, lan, style_name)
             };
 
             // Log token count (helpful for debugging context limits)
@@ -380,6 +476,7 @@ impl TTSKoko {
         &self,
         text: &str,
         lan: &str,
+        style_name: &str,
     ) -> (Vec<i64>, Vec<(String, usize, usize)>) {
         // We will produce tokens from the full, context-aware phonemes (best prosody)
         // and build an alignment map by estimating per-word token spans using
@@ -389,9 +486,38 @@ impl TTSKoko {
         // 1) Full-phrase phonemes and tokens (prosody source)
         let full_phonemes = {
             let _guard = ESPEAK_MUTEX.lock().unwrap();
-            text_to_phonemes(text, lan, None, true, false)
-                .unwrap_or_default()
-                .join("")
+            
+            let data_path = std::env::var("ESPEAK_DATA_PATH").unwrap_or_default();
+            log::info!("ESPEAK_CALL: lan={}, text='{}', data_path='{}'", lan, text, data_path);
+            
+            let mut phonemes_res = text_to_phonemes(text, lan, None, true, false);
+            
+            // Fallback for en-gb / en-GB
+            let lan_lower = lan.to_lowercase();
+            if (phonemes_res.is_err() || phonemes_res.as_ref().unwrap().is_empty()) && lan_lower.contains("gb") {
+                log::warn!("ESPEAK: {} failed, trying 'en-gb-x-rp' fallback", lan);
+                phonemes_res = text_to_phonemes(text, "en-gb-x-rp", None, true, false);
+                
+                if phonemes_res.is_err() || phonemes_res.as_ref().unwrap().is_empty() {
+                    log::warn!("ESPEAK: en-gb-x-rp failed, trying 'en' fallback");
+                    phonemes_res = text_to_phonemes(text, "en", None, true, false);
+                }
+            } else if (phonemes_res.is_err() || phonemes_res.as_ref().unwrap().is_empty()) && lan_lower.contains("pt") {
+                log::warn!("ESPEAK: {} failed, trying 'pt' fallback", lan);
+                phonemes_res = text_to_phonemes(text, "pt", None, true, false);
+            }
+
+            let res = match phonemes_res {
+                Ok(p) => p.join(""),
+                Err(e) => {
+                    log::error!("ESPEAK_ERROR: lan={}, error={}", lan, e);
+                    String::new()
+                }
+            };
+            
+            log::info!("ESPEAK_RESULT: lan={}, result='{}'", lan, res);
+            
+            normalize_phonemes(&res, lan, style_name)
         };
         let all_tokens = tokenize(&full_phonemes);
 
@@ -532,18 +658,20 @@ impl TTSKoko {
         &self,
         text: &str,
         lan: &str,
+        style_name: &str,
     ) -> (Vec<i64>, Vec<(String, usize, usize)>) {
         let full_phonemes = {
             let _guard = ESPEAK_MUTEX.lock().unwrap();
-            text_to_phonemes(text, lan, None, true, false)
+            let res = text_to_phonemes(text, lan, None, true, false)
                 .unwrap_or_default()
-                .join("")
+                .join("");
+            normalize_phonemes(&res, lan, style_name)
         };
         let all_tokens = tokenize(&full_phonemes);
         (all_tokens, Vec::new())
     }
 
-    fn split_text_into_chunks(&self, text: &str, max_tokens: usize, lan: &str) -> Vec<String> {
+    fn split_text_into_chunks(&self, text: &str, max_tokens: usize, lan: &str, style_name: &str) -> Vec<String> {
         let mut chunks = Vec::new();
 
         // First split by sentences - using common sentence ending punctuation
@@ -561,9 +689,10 @@ impl TTSKoko {
             // Convert to phonemes to check token count
             let sentence_phonemes = {
                 let _guard = ESPEAK_MUTEX.lock().unwrap();
-                text_to_phonemes(&sentence, lan, None, true, false)
+                let res = text_to_phonemes(&sentence, lan, None, true, false)
                     .unwrap_or_default()
-                    .join("")
+                    .join("");
+                normalize_phonemes(&res, lan, style_name)
             };
             let token_count = tokenize(&sentence_phonemes).len();
 
@@ -581,9 +710,10 @@ impl TTSKoko {
 
                     let test_phonemes = {
                         let _guard = ESPEAK_MUTEX.lock().unwrap();
-                        text_to_phonemes(&test_chunk, lan, None, true, false)
+                        let res = text_to_phonemes(&test_chunk, lan, None, true, false)
                             .unwrap_or_default()
-                            .join("")
+                            .join("");
+                        normalize_phonemes(&res, lan, style_name)
                     };
                     let test_tokens = tokenize(&test_phonemes).len();
 
@@ -605,9 +735,10 @@ impl TTSKoko {
                 let test_text = format!("{} {}", current_chunk, sentence);
                 let test_phonemes = {
                     let _guard = ESPEAK_MUTEX.lock().unwrap();
-                    text_to_phonemes(&test_text, lan, None, true, false)
+                    let res = text_to_phonemes(&test_text, lan, None, true, false)
                         .unwrap_or_default()
-                        .join("")
+                        .join("");
+                    normalize_phonemes(&res, lan, style_name)
                 };
                 let test_tokens = tokenize(&test_phonemes).len();
 

@@ -46,37 +46,61 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val prefs = remember { context.getSharedPreferences("KokoroPrefs", Context.MODE_PRIVATE) }
 
+    // Defined voices data
+    val languageGroups = listOf(
+        "US English" to listOf(
+            "af_alloy", "af_aoede", "af_bella", "af_heart", "af_jessica", "af_kore", 
+            "af_nicole", "af_nova", "af_river", "af_sarah", "af_sky",
+            "am_adam", "am_echo", "am_eric", "am_fenrir", "am_liam", "am_michael", 
+            "am_onyx", "am_puck", "am_santa"
+        ),
+        "UK English" to listOf(
+            "bf_alice", "bf_emma", "bf_isabella", "bf_lily",
+            "bm_daniel", "bm_fable", "bm_george", "bm_lewis"
+        ),
+        "Spanish" to listOf("ef_dora", "em_alex", "em_santa"),
+        "French" to listOf("ff_siwis"),
+        "Hindi" to listOf("hf_alpha", "hf_beta", "hm_omega", "hm_psi"),
+        "Italian" to listOf("if_sara", "im_nicola"),
+        "Japanese" to listOf("jf_alpha", "jf_gongitsune", "jf_nezumi", "jf_tebukuro", "jm_kumo"),
+        "Brazilian Portuguese" to listOf("pf_dora", "pm_alex", "pm_santa"),
+        "Mandarin Chinese" to listOf("zf_xiaobei", "zf_xiaoni", "zf_xiaoxiao")
+    )
+
     // State management
-    var selectedVoice by remember { mutableStateOf(prefs.getString("voice_skin", "af_sky") ?: "af_sky") }
+    var selectedVoice by remember { mutableStateOf(prefs.getString("voice_skin", "af_heart") ?: "af_heart") }
+    
+    // Determine initial language from selected voice
+    val initialLanguage = remember {
+        languageGroups.find { it.second.contains(selectedVoice) }?.first ?: "US English"
+    }
+    var selectedLanguage by remember { mutableStateOf(initialLanguage) }
+    
     var speedMultiplier by remember { mutableFloatStateOf(prefs.getFloat("speed_multiplier", 1.0f)) }
     var ortThreads by remember { mutableIntStateOf(prefs.getInt("ort_threads", 4)) }
     var xnnpackThreads by remember { mutableIntStateOf(prefs.getInt("xnnpack_threads", 1)) }
-    var backendInfo by remember { mutableStateOf("Loading...") }
     var isSynthesizing by remember { mutableStateOf(false) }
     var isEngineReady by remember { mutableStateOf(false) }
     var initStatus by remember { mutableStateOf("Checking assets...") }
 
-    val voices = listOf(
-        "af_heart", "af_sky", "af_bella", "af_nicole", "af_sarah",
-        "am_adam", "am_michael",
-        "bf_emma", "bf_isabella",
-        "bm_george", "bm_lewis"
-    )
+    val threadOptions = listOf(1, 2, 3, 4, 5, 6, 8)
 
-    val threadOptions = listOf(1, 2, 3, 4, 6, 8)
+    // Filtered voices based on selected language
+    val filteredVoices = remember(selectedLanguage) {
+        languageGroups.find { it.first == selectedLanguage }?.second ?: emptyList()
+    }
 
     // Startup Initialization
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
             try {
-                initStatus = "Preparing assets..."
                 val filesDir = context.filesDir
                 val modelDir = File(filesDir, "model")
                 if (!modelDir.exists()) modelDir.mkdirs()
@@ -85,20 +109,35 @@ fun SettingsScreen() {
                 val voicesFile = File(modelDir, "voices.bin")
                 val espeakDir = File(filesDir, "espeak-ng-data")
 
-                // 1. Copy files if missing
-                if (!modelFile.exists()) copyAsset(context, "model/model.onnx", modelFile)
-                if (!voicesFile.exists()) copyAsset(context, "model/voices.bin", voicesFile)
+                // 1. Download files if missing from stable GitHub release
+                val modelUrl = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx"
+                val voicesUrl = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
+
+                if (!modelFile.exists()) {
+                    downloadFile(modelUrl, modelFile) { p ->
+                        initStatus = "Downloading Model: $p%"
+                    }
+                }
+                if (!voicesFile.exists()) {
+                    downloadFile(voicesUrl, voicesFile) { p ->
+                        initStatus = "Downloading Voices: $p%"
+                    }
+                }
                 
                 if (!File(espeakDir, "phondata").exists()) {
-                    initStatus = "Extracting data..."
+                    initStatus = "Preparing data..."
                     val zip = File(filesDir, "espeak-ng-data.zip")
-                    copyAsset(context, "espeak-ng-data.zip", zip)
+                    if (!zip.exists()) {
+                         copyAsset(context, "espeak-ng-data.zip", zip)
+                    }
                     extractZipFile(zip, filesDir)
                     zip.delete()
                 }
 
                 // 2. Pre-initialize engine into memory
                 initStatus = "Loading engine..."
+                Log.i("KokoroUI", "Initializing JNI with: \nModel: ${modelFile.absolutePath} (${modelFile.length()} bytes)\nVoices: ${voicesFile.absolutePath} (${voicesFile.length()} bytes)\nData: ${filesDir.absolutePath}")
+                
                 val success = KokoroJNI.initialize(
                     modelFile.absolutePath, 
                     voicesFile.absolutePath, 
@@ -110,7 +149,6 @@ fun SettingsScreen() {
                 if (success) {
                     isEngineReady = true
                     initStatus = "Ready"
-                    backendInfo = KokoroJNI.getBackendInfo()
                 } else {
                     initStatus = "Engine Error"
                 }
@@ -135,7 +173,7 @@ fun SettingsScreen() {
         scope.launch {
             withContext(Dispatchers.IO) {
                 isEngineReady = false
-                initStatus = "Updating threads..."
+                initStatus = "Updating engine..."
                 KokoroJNI.shutdown()
                 
                 val filesDir = context.filesDir
@@ -154,7 +192,6 @@ fun SettingsScreen() {
                 if (success) {
                     isEngineReady = true
                     initStatus = "Ready"
-                    backendInfo = KokoroJNI.getBackendInfo()
                 } else {
                     initStatus = "Engine Error"
                 }
@@ -175,8 +212,49 @@ fun SettingsScreen() {
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        // --- Voice Selection ---
-        Text(text = "Voice Selection", style = MaterialTheme.typography.titleMedium)
+        // --- Language Selection (Radio Buttons) ---
+        Text(text = "Language Selection", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            languageGroups.forEach { (lang, _) ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { 
+                        selectedLanguage = lang
+                        val newVoices = languageGroups.find { it.first == lang }?.second ?: emptyList()
+                        if (!newVoices.contains(selectedVoice)) {
+                            val firstVoice = newVoices.firstOrNull() ?: "af_heart"
+                            selectedVoice = firstVoice
+                            prefs.edit().putString("voice_skin", firstVoice).apply()
+                        }
+                    }
+                ) {
+                    RadioButton(
+                        selected = (selectedLanguage == lang),
+                        onClick = { 
+                            selectedLanguage = lang
+                            val newVoices = languageGroups.find { it.first == lang }?.second ?: emptyList()
+                            if (!newVoices.contains(selectedVoice)) {
+                                val firstVoice = newVoices.firstOrNull() ?: "af_heart"
+                                selectedVoice = firstVoice
+                                prefs.edit().putString("voice_skin", firstVoice).apply()
+                            }
+                        }
+                    )
+                    Text(text = lang, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- Voice Selection (Filtered Dropdown) ---
+        Text(text = "Voice Selection ($selectedLanguage)", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         
         var expanded by remember { mutableStateOf(false) }
@@ -203,7 +281,7 @@ fun SettingsScreen() {
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                voices.forEach { voice ->
+                filteredVoices.forEach { voice ->
                     DropdownMenuItem(
                         text = { Text(voice) },
                         onClick = {
@@ -247,104 +325,23 @@ fun SettingsScreen() {
                     }
                 }
             }
-            
-            Spacer(modifier = Modifier.width(16.dp))
-            
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = "XNNPACK Threads", style = MaterialTheme.typography.titleSmall)
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                var xnnExpanded by remember { mutableStateOf(false) }
-                Box {
-                    OutlinedTextField(
-                        value = xnnpackThreads.toString(),
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = xnnExpanded) },
-                        modifier = Modifier.clickable { xnnExpanded = !xnnExpanded }
-                    )
-                    Box(modifier = Modifier.matchParentSize().clickable { xnnExpanded = !xnnExpanded })
-                    DropdownMenu(expanded = xnnExpanded, onDismissRequest = { xnnExpanded = false }) {
-                        threadOptions.forEach { count ->
-                            DropdownMenuItem(
-                                text = { Text(count.toString()) },
-                                onClick = {
-                                    if (count != xnnpackThreads) updateThreads(ortThreads, count)
-                                    xnnExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
         }
         Text(
-            text = "Recommended: ORT 4, XNNPACK 1 for balanced power/speed.",
+            text = "Recommended: 4 threads for most modern octa-core devices.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // --- Backend Info ---
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Active Backend: ", style = MaterialTheme.typography.titleSmall)
-            Surface(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = MaterialTheme.shapes.small
-            ) {
-                Text(
-                    text = backendInfo,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- Speed Selection ---
-        Text(text = "Default Speed Multiplier", style = MaterialTheme.typography.titleMedium)
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Text(
-            text = String.format("%.2fx", speedMultiplier),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        
-        Slider(
-            value = speedMultiplier,
-            onValueChange = { newValue ->
-                val snapped = (newValue * 20).roundToInt() / 20.0f
-                speedMultiplier = snapped
-            },
-            onValueChangeFinished = {
-                prefs.edit().putFloat("speed_multiplier", speedMultiplier).apply()
-            },
-            valueRange = 0.7f..1.0f,
-            steps = 5,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Text(
-            text = "Adjusts the base speaking rate relative to the system setting.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        // --- Test Audio Button ---
+        // --- Test Audio / Progress Button ---
         Button(
             onClick = {
                 if (!isSynthesizing && isEngineReady) {
                     scope.launch {
                         isSynthesizing = true
                         try {
-                            playSample(context, selectedVoice, speedMultiplier)
+                            playSample(context, selectedVoice, selectedLanguage, 1.0f)
                         } catch (e: Exception) {
                             Toast.makeText(context, "Playback failed: ${e.message}", Toast.LENGTH_SHORT).show()
                         } finally {
@@ -354,7 +351,7 @@ fun SettingsScreen() {
                 }
             },
             enabled = isEngineReady && !isSynthesizing,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {
             if (isSynthesizing) {
                 CircularProgressIndicator(
@@ -405,9 +402,35 @@ private fun extractZipFile(zipFile: File, destDir: File) {
     }
 }
 
-private fun playSample(context: Context, voice: String, speed: Float) {
-    val text = "This is a sample of Kokoro TTS running natively on Android with optimized threading."
-    val samples = KokoroJNI.synthesize(text, voice, speed) ?: return
+private suspend fun playSample(context: Context, voice: String, language: String, speed: Float) {
+    val text = when (language) {
+        "Spanish" -> "Esta es una muestra del motor de texto a voz de Kokoro en español."
+        "French" -> "Ceci est un échantillon du moteur de synthèse vocale Kokoro en français."
+        "Hindi" -> "यह हिंदी में कोकोरो टेक्स्ट टू स्पीच इंजन का एक नमूना है।"
+        "Italian" -> "Questo è un esempio del motore di sintesi vocale Kokoro in italiano."
+        // Use Kana only for Japanese as eSpeak-ng struggles with Kanji Kanji Kanji
+        "Japanese" -> "これは、ココログルー、テキストよみあげエンジンのサンプルです。" 
+        "Brazilian Portuguese" -> "Esta é uma amostra do motor de texto para fala Kokoro em português."
+        "Mandarin Chinese" -> "这是 Kokoro 文本转语音引擎的中文示例。"
+        "UK English" -> "This is a sample of the Kokoro Text to Speech engine in British English."
+        else -> "This is a sample of the Kokoro Text to Speech engine in American English."
+    }
+
+    val langCode = when (language) {
+        "Spanish" -> "es"
+        "French" -> "fr"
+        "Hindi" -> "hi"
+        "Italian" -> "it"
+        "Japanese" -> "ja"
+        "Brazilian Portuguese" -> "pt-br"
+        "Mandarin Chinese" -> "cmn"
+        "UK English" -> "en-us"
+        else -> "en-us"
+    }
+
+    val samples = withContext(Dispatchers.IO) {
+        KokoroJNI.synthesize(text, voice, langCode, speed)
+    } ?: return
 
     val sampleRate = 24000
     val audioTrack = AudioTrack.Builder()
@@ -430,7 +453,51 @@ private fun playSample(context: Context, voice: String, speed: Float) {
 
     audioTrack.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
     audioTrack.play()
+    
+    // Wait for the audio to finish playing
+    val durationMs = (samples.size.toFloat() / sampleRate * 1000).toLong()
+    kotlinx.coroutines.delay(durationMs)
+    
+    audioTrack.release()
 }
 
 @Composable
 fun Demo() {}
+
+private suspend fun downloadFile(urlStr: String, dest: File, onProgress: (Int) -> Unit) {
+    withContext(Dispatchers.IO) {
+        val url = java.net.URL(urlStr)
+        val connection = url.openConnection() as java.net.HttpURLConnection
+        connection.instanceFollowRedirects = true
+        connection.connect()
+        
+        if (connection.responseCode != java.net.HttpURLConnection.HTTP_OK) {
+            throw Exception("Server returned HTTP ${connection.responseCode}")
+        }
+        
+        val fileLength = connection.contentLength
+        val input = connection.inputStream
+        val output = java.io.FileOutputStream(dest)
+        
+        val data = ByteArray(4096)
+        var total: Long = 0
+        var count: Int
+        var lastProgress = -1
+        
+        while (input.read(data).also { count = it } != -1) {
+            total += count
+            if (fileLength > 0) {
+                val progress = (total * 100 / fileLength).toInt()
+                if (progress != lastProgress) {
+                    onProgress(progress)
+                    lastProgress = progress
+                }
+            }
+            output.write(data, 0, count)
+        }
+        
+        output.flush()
+        output.close()
+        input.close()
+    }
+}
