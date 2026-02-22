@@ -17,7 +17,7 @@ pub trait OrtBase {
         let model_path_obj = Path::new(&model_path);
         
         let mut is_stale = false;
-        if optimized_path.exists() {
+        if optimized_path.exists() && model_path_obj.exists() {
             if let (Ok(m1), Ok(m2)) = (model_path_obj.metadata(), optimized_path.metadata()) {
                 if let (Ok(t1), Ok(t2)) = (m1.modified(), m2.modified()) {
                     if t1 > t2 {
@@ -44,11 +44,14 @@ pub trait OrtBase {
         let (final_path, opt_level, should_cleanup) = if optimized_path.exists() && !is_stale {
             log::info!("Loading pre-optimized model from: {}", optimized_path_str);
             (optimized_path_str.clone(), ort::session::builder::GraphOptimizationLevel::Disable, false)
-        } else {
+        } else if model_path_obj.exists() {
             log::info!("Optimizing model and saving to: {}", optimized_path_str);
             builder = builder.with_optimized_model_path(&optimized_path_str)
                 .map_err(|e| format!("Failed to set optimized model path: {}", e))?;
             (model_path.clone(), ort::session::builder::GraphOptimizationLevel::Level3, true)
+        } else {
+            // This case should only happen if model.onnx was deleted but optimized isn't there yet (race condition)
+            return Err("Neither original model nor optimized cache exists.".to_string());
         };
 
         let session = builder
