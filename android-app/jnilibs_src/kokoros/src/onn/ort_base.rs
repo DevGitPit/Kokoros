@@ -20,8 +20,10 @@ pub trait OrtBase {
         if optimized_path.exists() && model_path_obj.exists() {
             if let (Ok(m1), Ok(m2)) = (model_path_obj.metadata(), optimized_path.metadata()) {
                 if let (Ok(t1), Ok(t2)) = (m1.modified(), m2.modified()) {
-                    if t1 > t2 {
-                        log::info!("Original model is newer than optimized cache. Re-optimizing...");
+                    // Add a 2-second buffer to handle filesystem timestamp precision/skew
+                    let t2_plus_buffer = t2 + std::time::Duration::from_secs(2);
+                    if t1 > t2_plus_buffer {
+                        log::info!("Original model is significantly newer than optimized cache. Re-optimizing...");
                         is_stale = true;
                     }
                 }
