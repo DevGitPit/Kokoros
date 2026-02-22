@@ -105,14 +105,8 @@ fun SettingsScreen() {
                 val modelDir = File(filesDir, "model")
                 if (!modelDir.exists()) modelDir.mkdirs()
                 
-                // Cleanup / Migration: ensure we use the standard model.onnx name
-                val qualityModel = File(modelDir, "model_quality.onnx")
-                val perfModel = File(modelDir, "model_perf.onnx")
                 val standardModel = File(modelDir, "model.onnx")
-                
-                if (qualityModel.exists()) qualityModel.renameTo(standardModel)
-                if (perfModel.exists()) perfModel.delete()
-                
+                val optimizedModel = File(modelDir, "model.onnx.optimized")
                 val voicesFile = File(modelDir, "voices.bin")
                 val espeakDir = File(filesDir, "espeak-ng-data")
 
@@ -120,14 +114,15 @@ fun SettingsScreen() {
                 val voicesUrl = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
 
                 // 1. Download files if missing (Atomic download with .tmp)
-                // Skip if optimized model already exists
-                val optimizedModel = File(modelDir, "model.onnx.optimized")
-                if (!standardModel.exists() && !optimizedModel.exists()) {
-                    val tmpFile = File(modelDir, "model.onnx.tmp")
-                    downloadFile(modelUrl, tmpFile) { p ->
-                        initStatus = "Downloading Model: $p%"
+                // Skip EVERYTHING if optimized model already exists to avoid race conditions with the Service
+                if (!optimizedModel.exists()) {
+                    if (!standardModel.exists()) {
+                        val tmpFile = File(modelDir, "model.onnx.tmp")
+                        downloadFile(modelUrl, tmpFile) { p ->
+                            initStatus = "Downloading Model: $p%"
+                        }
+                        if (!tmpFile.renameTo(standardModel)) throw Exception("Failed to finalize model download")
                     }
-                    if (!tmpFile.renameTo(standardModel)) throw Exception("Failed to finalize model download")
                 }
                 
                 if (!voicesFile.exists()) {
