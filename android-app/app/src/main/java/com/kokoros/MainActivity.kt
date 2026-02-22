@@ -115,7 +115,12 @@ fun SettingsScreen() {
 
                 // 1. Download files if missing (Atomic download with .tmp)
                 // Skip EVERYTHING if optimized model already exists to avoid race conditions with the Service
-                if (!optimizedModel.exists()) {
+                if (optimizedModel.exists()) {
+                    Log.i("KokoroCheck", "Optimized model found. Skipping source model checks.")
+                    // Cleanup any leftover source or tmp files to save space
+                    if (standardModel.exists()) standardModel.delete()
+                    File(modelDir, "model.onnx.tmp").delete()
+                } else {
                     if (!standardModel.exists()) {
                         val tmpFile = File(modelDir, "model.onnx.tmp")
                         downloadFile(modelUrl, tmpFile) { p ->
