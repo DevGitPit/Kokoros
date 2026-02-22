@@ -25,7 +25,7 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_init(
     android_logger::init_once(
         Config::default()
             .with_tag("KokoroNative")
-            .with_max_level(LevelFilter::Debug)
+            .with_max_level(LevelFilter::Info) // Set to Info to reduce log spam but keep important JNI logs
     );
 
     info!("Initializing Kokoro Native Engine (Single Instance)...");
@@ -103,6 +103,7 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_speak_1raw(
     };
 
     info!("JNI speak_raw: voice={}, lang={}, speed={}", voice_str, lang_str, speed);
+    let start_time = std::time::Instant::now();
 
     let audio_result = engine.rt.block_on(async {
         engine.tts.tts_raw_audio(
@@ -116,6 +117,9 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_speak_1raw(
             None
         )
     });
+
+    let duration = start_time.elapsed();
+    info!("JNI speak_raw: completed in {}ms", duration.as_millis());
 
     match audio_result {
         Ok(samples) => {

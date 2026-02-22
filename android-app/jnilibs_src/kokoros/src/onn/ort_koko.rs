@@ -14,14 +14,7 @@ mod model_schema {
     pub const STYLE: &str = "style";
     pub const SPEED: &str = "speed";
 
-    pub mod v1_0 {
-        pub const TOKENS: &str = "tokens";
-        pub const AUDIO: &str = "audio";
-    }
-
     pub mod v1_0_timestamped {
-        pub const TOKENS: &str = "input_ids";
-        pub const AUDIO: &str = "waveform";
         // We define primary and fallback keys as a const array
         pub const DURATIONS: &str = "durations";
     }
@@ -34,38 +27,36 @@ pub enum ModelStrategy {
 
 pub struct OrtKoko {
     inner: Option<ModelStrategy>,
-}
-
-impl ModelStrategy {
-    fn audio_key(&self) -> &'static str {
-        match self {
-            ModelStrategy::Standard(_) => model_schema::v1_0::AUDIO,
-            ModelStrategy::Timestamped(_) => model_schema::v1_0_timestamped::AUDIO,
-        }
-    }
-
-    fn tokens_key(&self) -> &'static str {
-        match self {
-            ModelStrategy::Standard(_) => model_schema::v1_0::TOKENS,
-            ModelStrategy::Timestamped(_) => model_schema::v1_0_timestamped::TOKENS,
-        }
-    }
+    tokens_key: String,
+    audio_key: String,
 }
 
 impl OrtBase for OrtKoko {
     fn set_sess(&mut self, sess: Session) {
         let output_count = sess.outputs().len();
+        
+        // Detect tokens/input_ids key
+        self.tokens_key = sess.inputs().iter()
+            .find(|i| i.name() == "tokens" || i.name() == "input_ids")
+            .map(|i| i.name().to_string())
+            .unwrap_or_else(|| "tokens".to_string());
+
+        // Detect audio/waveform key
+        self.audio_key = sess.outputs().iter()
+            .find(|o| o.name() == "audio" || o.name() == "waveform" || o.name() == "waveforms")
+            .map(|o| o.name().to_string())
+            .unwrap_or_else(|| "audio".to_string());
 
         let strategy = if output_count > 1 {
             tracing::info!(
-                "OrtKoko: Timestamped backend activated ({} outputs)",
-                output_count
+                "OrtKoko: Timestamped backend activated ({} outputs). Keys: {} -> {}",
+                output_count, self.tokens_key, self.audio_key
             );
             ModelStrategy::Timestamped(sess)
         } else {
             tracing::info!(
-                "OrtKoko: Standard backend activated ({} output)",
-                output_count
+                "OrtKoko: Standard backend activated ({} output). Keys: {} -> {}",
+                output_count, self.tokens_key, self.audio_key
             );
             ModelStrategy::Standard(sess)
         };
@@ -82,7 +73,11 @@ impl OrtBase for OrtKoko {
 }
 impl OrtKoko {
     pub fn new(model_path: String, intra_threads: usize, xnnpack_threads: usize) -> Result<Self, String> {
-        let mut instance = OrtKoko { inner: None };
+        let mut instance = OrtKoko { 
+            inner: None,
+            tokens_key: "tokens".to_string(),
+            audio_key: "audio".to_string(),
+        };
         instance.load_model(model_path, intra_threads, xnnpack_threads)?;
         Ok(instance)
     }
@@ -92,7 +87,7 @@ impl OrtKoko {
     }
 
     fn prepare_inputs(
-        tokens_key: &'static str,
+        tokens_key: &str,
         tokens: Vec<Vec<i64>>,
         styles: Vec<Vec<f32>>,
         speed: f32,
@@ -112,7 +107,7 @@ impl OrtKoko {
 
         Ok(vec![
             (
-                Cow::Borrowed(tokens_key),
+                Cow::Owned(tokens_key.to_string()),
                 SessionInputValue::Owned(Value::from(tokens_tensor)),
             ),
             (
@@ -148,18 +143,16 @@ impl OrtKoko {
         );
 
         let strategy = self.inner.as_mut().ok_or("Session is not initialized.")?;
-        let audio_key = strategy.audio_key();
-        let tokens_key = strategy.tokens_key();
-        let inputs = Self::prepare_inputs(tokens_key, tokens.clone(), styles, speed)?;
+        let audio_key = self.audio_key.clone();
+        let tokens_key = self.tokens_key.clone();
+        let inputs = Self::prepare_inputs(&tokens_key, tokens.clone(), styles, speed)?;
         match strategy {
             ModelStrategy::Standard(sess) => {
                 let outputs = sess.run(SessionInputs::from(inputs))?;
 
-                let (shape, data) = outputs[audio_key]
+                let (shape, data) = outputs[audio_key.as_str()]
                     .try_extract_tensor::<f32>()
-                    .or_else(|_| outputs["waveforms"].try_extract_tensor::<f32>())
-                    .or_else(|_| outputs["audio"].try_extract_tensor::<f32>())
-                    .map_err(|_| "Standard Model: Could not find 'audio' or 'waveforms' output")?;
+                    .map_err(|_| format!("Standard Model: Could not find output tensor '{}'", audio_key))?;
 
                 let shape_vec: Vec<usize> = shape.into_iter().map(|&i| i as usize).collect();
                 tracing::debug!("Standard Model: output shape: {:?}", shape_vec);
@@ -170,11 +163,9 @@ impl OrtKoko {
             ModelStrategy::Timestamped(sess) => {
                 let outputs = sess.run(SessionInputs::from(inputs))?;
 
-                let (shape, data) = outputs[audio_key]
+                let (shape, data) = outputs[audio_key.as_str()]
                     .try_extract_tensor::<f32>()
-                    .or_else(|_| outputs["audio"].try_extract_tensor::<f32>())
-                    .or_else(|_| outputs["waveforms"].try_extract_tensor::<f32>())
-                    .map_err(|_| "Timestamped Model: Could not find 'audio' or 'waveforms'")?;
+                    .map_err(|_| format!("Timestamped Model: Could not find output tensor '{}'", audio_key))?;
 
                 let shape_vec: Vec<usize> = shape.into_iter().map(|&i| i as usize).collect();
                 tracing::debug!("Timestamped Model: output shape: {:?}", shape_vec);
@@ -184,8 +175,7 @@ impl OrtKoko {
                     .try_extract_tensor::<f32>()
                     .map(|(_, d)| d.to_vec())
                     .map_err(|_| format!(
-                        "Timestamped Model Error: Expected output tensor '{}' of type f32. \
-                        If your model uses 'duration' (singular) or i64, please update the schema constants.",
+                        "Timestamped Model Error: Expected output tensor '{}' of type f32.",
                         DURATIONS
                     ))?;
 

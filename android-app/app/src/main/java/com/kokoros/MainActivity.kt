@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableIntStateOf
@@ -83,9 +85,7 @@ fun SettingsScreen() {
     }
     var selectedLanguage by remember { mutableStateOf(initialLanguage) }
     
-    var speedMultiplier by remember { mutableFloatStateOf(prefs.getFloat("speed_multiplier", 1.0f)) }
     var ortThreads by remember { mutableIntStateOf(prefs.getInt("ort_threads", 4)) }
-    var xnnpackThreads by remember { mutableIntStateOf(prefs.getInt("xnnpack_threads", 1)) }
     var isSynthesizing by remember { mutableStateOf(false) }
     var isEngineReady by remember { mutableStateOf(false) }
     var initStatus by remember { mutableStateOf("Checking assets...") }
@@ -105,23 +105,36 @@ fun SettingsScreen() {
                 val modelDir = File(filesDir, "model")
                 if (!modelDir.exists()) modelDir.mkdirs()
                 
-                val modelFile = File(modelDir, "model.onnx")
+                // Cleanup / Migration: ensure we use the standard model.onnx name
+                val qualityModel = File(modelDir, "model_quality.onnx")
+                val perfModel = File(modelDir, "model_perf.onnx")
+                val standardModel = File(modelDir, "model.onnx")
+                
+                if (qualityModel.exists()) qualityModel.renameTo(standardModel)
+                if (perfModel.exists()) perfModel.delete()
+                
                 val voicesFile = File(modelDir, "voices.bin")
                 val espeakDir = File(filesDir, "espeak-ng-data")
 
-                // 1. Download files if missing from stable GitHub release
+                // URLs
                 val modelUrl = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx"
                 val voicesUrl = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
 
-                if (!modelFile.exists()) {
-                    downloadFile(modelUrl, modelFile) { p ->
+                // 1. Download files if missing (Atomic download with .tmp)
+                if (!standardModel.exists()) {
+                    val tmpFile = File(modelDir, "model.onnx.tmp")
+                    downloadFile(modelUrl, tmpFile) { p ->
                         initStatus = "Downloading Model: $p%"
                     }
+                    if (!tmpFile.renameTo(standardModel)) throw Exception("Failed to finalize model download")
                 }
+                
                 if (!voicesFile.exists()) {
-                    downloadFile(voicesUrl, voicesFile) { p ->
+                    val tmpFile = File(modelDir, "voices.bin.tmp")
+                    downloadFile(voicesUrl, tmpFile) { p ->
                         initStatus = "Downloading Voices: $p%"
                     }
+                    if (!tmpFile.renameTo(voicesFile)) throw Exception("Failed to finalize voices download")
                 }
                 
                 if (!File(espeakDir, "phondata").exists()) {
@@ -136,21 +149,22 @@ fun SettingsScreen() {
 
                 // 2. Pre-initialize engine into memory
                 initStatus = "Loading engine..."
-                Log.i("KokoroUI", "Initializing JNI with: \nModel: ${modelFile.absolutePath} (${modelFile.length()} bytes)\nVoices: ${voicesFile.absolutePath} (${voicesFile.length()} bytes)\nData: ${filesDir.absolutePath}")
-                
                 val success = KokoroJNI.initialize(
-                    modelFile.absolutePath, 
+                    standardModel.absolutePath, 
                     voicesFile.absolutePath, 
                     filesDir.absolutePath, 
                     ortThreads,
-                    xnnpackThreads
+                    1
                 )
                 
                 if (success) {
                     isEngineReady = true
                     initStatus = "Ready"
                 } else {
-                    initStatus = "Engine Error"
+                    initStatus = "Corrupt Model Detected"
+                    // If initialization fails, the model might be corrupt. Delete it to trigger redownload on next run.
+                    standardModel.delete()
+                    File(modelDir, "model.onnx.optimized").delete()
                 }
             } catch (e: Exception) {
                 initStatus = "Init Failed"
@@ -162,13 +176,9 @@ fun SettingsScreen() {
     }
 
     // Helper to re-initialize engine
-    fun updateThreads(newOrt: Int, newXnn: Int) {
+    fun updateThreads(newOrt: Int) {
         ortThreads = newOrt
-        xnnpackThreads = newXnn
-        prefs.edit()
-            .putInt("ort_threads", newOrt)
-            .putInt("xnnpack_threads", newXnn)
-            .apply()
+        prefs.edit().putInt("ort_threads", newOrt).apply()
         
         scope.launch {
             withContext(Dispatchers.IO) {
@@ -186,7 +196,7 @@ fun SettingsScreen() {
                     voicesFile.absolutePath, 
                     filesDir.absolutePath, 
                     newOrt,
-                    newXnn
+                    1
                 )
                 
                 if (success) {
@@ -202,7 +212,8 @@ fun SettingsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
@@ -317,7 +328,7 @@ fun SettingsScreen() {
                             DropdownMenuItem(
                                 text = { Text(count.toString()) },
                                 onClick = {
-                                    if (count != ortThreads) updateThreads(count, xnnpackThreads)
+                                    if (count != ortThreads) updateThreads(count)
                                     ortExpanded = false
                                 }
                             )
@@ -408,7 +419,6 @@ private suspend fun playSample(context: Context, voice: String, language: String
         "French" -> "Ceci est un échantillon du moteur de synthèse vocale Kokoro en français."
         "Hindi" -> "यह हिंदी में कोकोरो टेक्स्ट टू स्पीच इंजन का एक नमूना है।"
         "Italian" -> "Questo è un esempio del motore di sintesi vocale Kokoro in italiano."
-        // Use Kana only for Japanese as eSpeak-ng struggles with Kanji Kanji Kanji
         "Japanese" -> "これは、ココログルー、テキストよみあげエンジンのサンプルです。" 
         "Brazilian Portuguese" -> "Esta é uma amostra do motor de texto para fala Kokoro em português."
         "Mandarin Chinese" -> "这是 Kokoro 文本转语音引擎的中文示例。"

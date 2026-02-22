@@ -55,9 +55,11 @@ object KokoroJNI {
     // --- High-level Kotlin API ---
 
     fun initialize(modelPath: String, voicesPath: String, espeakDataPath: String, intraThreads: Int, xnnpackThreads: Int): Boolean {
-        if (enginePtr == 0L) {
-            enginePtr = init(modelPath, voicesPath, espeakDataPath, intraThreads, xnnpackThreads)
+        if (enginePtr != 0L) {
+            Log.i(TAG, "Engine already initialized. Skipping redundant initialization.")
+            return true
         }
+        enginePtr = init(modelPath, voicesPath, espeakDataPath, intraThreads, xnnpackThreads)
         return enginePtr != 0L
     }
 

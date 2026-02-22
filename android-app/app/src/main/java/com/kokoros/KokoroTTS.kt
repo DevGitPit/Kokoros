@@ -42,22 +42,23 @@ class KokoroTTS : TextToSpeechService() {
                 // Initialize TTS engine after assets are ready
                 val filesDir = applicationContext.filesDir
                 val modelDir = File(filesDir, "model")
-                modelPath = File(modelDir, MODEL_ONNX).absolutePath
+                val modelFile = File(modelDir, "model.onnx")
+                
+                modelPath = modelFile.absolutePath
                 voicesPath = File(modelDir, VOICES_BIN).absolutePath
                 val espeakParentPath = filesDir.absolutePath // espeak-ng expects path to parent of 'espeak-ng-data'
 
                 val prefs = applicationContext.getSharedPreferences("KokoroPrefs", Context.MODE_PRIVATE)
                 val ortThreads = prefs.getInt("ort_threads", 4)
-                val xnnpackThreads = prefs.getInt("xnnpack_threads", 1)
                 
-                ttsInitialized = KokoroJNI.initialize(modelPath!!, voicesPath!!, espeakParentPath, ortThreads, xnnpackThreads)
+                ttsInitialized = KokoroJNI.initialize(modelPath!!, voicesPath!!, espeakParentPath, ortThreads, 1)
                 if (ttsInitialized) {
                     Log.i(TAG, "Kokoro TTS engine initialized successfully.")
                 } else {
                     Log.e(TAG, "Failed to initialize Kokoro TTS engine.")
                 }
             } else {
-                Log.e(TAG, "Failed to copy assets.")
+                Log.e(TAG, "Failed to prepare assets.")
             }
             initLatch.countDown()
         }
@@ -108,169 +109,168 @@ class KokoroTTS : TextToSpeechService() {
         stopRequested = true
     }
 
-        override fun onGetDefaultVoiceNameFor(lang: String?, country: String?, variant: String?): String {
-            val language = lang?.lowercase(Locale.ROOT) ?: "en"
-            return when {
-                language.startsWith("es") -> "es-es-ef_dora"
-                language.startsWith("fr") -> "fr-fr-ff_siwis"
-                language.startsWith("hi") -> "hi-in-hf_alpha"
-                language.startsWith("it") -> "it-it-if_sara"
-                language.startsWith("ja") -> "ja-jp-jf_alpha"
-                language.startsWith("pt") -> "pt-br-pf_dora"
-                language.startsWith("zh") -> "zh-cn-zf_xiaoxiao"
-                else -> "en-us-af_heart"
+    override fun onGetDefaultVoiceNameFor(lang: String?, country: String?, variant: String?): String {
+        val language = lang?.lowercase(Locale.ROOT) ?: "en"
+        return when {
+            language.startsWith("es") -> "es-es-ef_dora"
+            language.startsWith("fr") -> "fr-fr-ff_siwis"
+            language.startsWith("hi") -> "hi-in-hf_alpha"
+            language.startsWith("it") -> "it-it-if_sara"
+            language.startsWith("ja") -> "ja-jp-jf_alpha"
+            language.startsWith("pt") -> "pt-br-pf_dora"
+            language.startsWith("zh") -> "zh-cn-zf_xiaoxiao"
+            else -> "en-us-af_heart"
+        }
+    }
+
+    override fun onGetVoices(): MutableList<Voice> {
+        val voices = mutableListOf<Voice>()
+        
+        val voiceSpecs = mapOf(
+            "en-us" to listOf(
+                "af_alloy", "af_aoede", "af_bella", "af_heart", "af_jessica", "af_kore", 
+                "af_nicole", "af_nova", "af_river", "af_sarah", "af_sky",
+                "am_adam", "am_echo", "am_eric", "am_fenrir", "am_liam", "am_michael", 
+                "am_onyx", "am_puck", "am_santa"
+            ),
+            "en-gb" to listOf(
+                "bf_alice", "bf_emma", "bf_isabella", "bf_lily",
+                "bm_daniel", "bm_fable", "bm_george", "bm_lewis"
+            ),
+            "es-es" to listOf("ef_dora", "em_alex", "em_santa"),
+            "fr-fr" to listOf("ff_siwis"),
+            "hi-in" to listOf("hf_alpha", "hf_beta", "hm_omega", "hm_psi"),
+            "it-it" to listOf("if_sara", "im_nicola"),
+            "ja-jp" to listOf("jf_alpha", "jf_gongitsune", "jf_nezumi", "jf_tebukuro", "jm_kumo"),
+            "pt-br" to listOf("pf_dora", "pm_alex", "pm_santa"),
+            "zh-cn" to listOf("zf_xiaobei", "zf_xiaoni", "zf_xiaoxiao")
+        )
+
+        for ((langTag, names) in voiceSpecs) {
+            val locale = Locale.forLanguageTag(langTag)
+            for (name in names) {
+                // Prepend langTag to the name for better compatibility with external readers
+                val systemName = "$langTag-$name"
+                voices.add(Voice(
+                    systemName,
+                    locale,
+                    Voice.QUALITY_VERY_HIGH,
+                    Voice.LATENCY_NORMAL,
+                    false,
+                    emptySet()
+                ))
             }
         }
-    
-        override fun onGetVoices(): MutableList<Voice> {
-            val voices = mutableListOf<Voice>()
-            
-            val voiceSpecs = mapOf(
-                "en-us" to listOf(
-                    "af_alloy", "af_aoede", "af_bella", "af_heart", "af_jessica", "af_kore", 
-                    "af_nicole", "af_nova", "af_river", "af_sarah", "af_sky",
-                    "am_adam", "am_echo", "am_eric", "am_fenrir", "am_liam", "am_michael", 
-                    "am_onyx", "am_puck", "am_santa"
-                ),
-                "en-gb" to listOf(
-                    "bf_alice", "bf_emma", "bf_isabella", "bf_lily",
-                    "bm_daniel", "bm_fable", "bm_george", "bm_lewis"
-                ),
-                "es-es" to listOf("ef_dora", "em_alex", "em_santa"),
-                "fr-fr" to listOf("ff_siwis"),
-                "hi-in" to listOf("hf_alpha", "hf_beta", "hm_omega", "hm_psi"),
-                "it-it" to listOf("if_sara", "im_nicola"),
-                "ja-jp" to listOf("jf_alpha", "jf_gongitsune", "jf_nezumi", "jf_tebukuro", "jm_kumo"),
-                "pt-br" to listOf("pf_dora", "pm_alex", "pm_santa"),
-                "zh-cn" to listOf("zf_xiaobei", "zf_xiaoni", "zf_xiaoxiao")
-            )
-    
-            for ((langTag, names) in voiceSpecs) {
-                val locale = Locale.forLanguageTag(langTag)
-                for (name in names) {
-                    // Prepend langTag to the name for better compatibility with external readers
-                    val systemName = "$langTag-$name"
-                    voices.add(Voice(
-                        systemName,
-                        locale,
-                        Voice.QUALITY_VERY_HIGH,
-                        Voice.LATENCY_NORMAL,
-                        false,
-                        emptySet()
-                    ))
-                }
-            }
-            return voices
+        return voices
+    }
+
+    override fun onSynthesizeText(req: SynthesisRequest?, callback: SynthesisCallback?) {
+        if (req == null || callback == null) return
+
+        val text = req.charSequenceText?.toString()
+        if (text == null) {
+            callback.error()
+            return
         }
-    
-        override fun onSynthesizeText(req: SynthesisRequest?, callback: SynthesisCallback?) {
-            if (req == null || callback == null) return
-    
-            val text = req.charSequenceText?.toString()
-            if (text == null) {
-                callback.error()
-                return
-            }
-    
-            // Wait for initialization if needed
-            if (!ttsInitialized) {
-                try {
-                    if (!initLatch.await(5, TimeUnit.SECONDS)) {
-                        Log.e(TAG, "Timed out waiting for TTS initialization.")
-                        callback.error()
-                        return
-                    }
-                } catch (e: InterruptedException) {
-                    Log.e(TAG, "Interrupted waiting for TTS initialization.")
+
+        // Wait for initialization if needed
+        if (!ttsInitialized) {
+            try {
+                if (!initLatch.await(5, TimeUnit.SECONDS)) {
+                    Log.e(TAG, "Timed out waiting for TTS initialization.")
                     callback.error()
                     return
                 }
+            } catch (e: InterruptedException) {
+                Log.e(TAG, "Interrupted waiting for TTS initialization.")
+                callback.error()
+                return
             }
-    
-            if (!ttsInitialized) {
-                 Log.e(TAG, "TTS failed to initialize.")
-                 callback.error()
-                 return
+        }
+
+        if (!ttsInitialized) {
+             Log.e(TAG, "TTS failed to initialize.")
+             callback.error()
+             return
+        }
+
+        // Load Preferences
+        val prefs = applicationContext.getSharedPreferences("KokoroPrefs", Context.MODE_PRIVATE)
+        val prefVoice = prefs.getString("voice_skin", "af_heart") ?: "af_heart"
+        val prefSpeedMult = prefs.getFloat("speed_multiplier", 1.0f)
+
+        stopRequested = false
+        
+        // Determine internal voice name and language code
+        val reqVoice = req.voiceName
+        var voiceName = if (reqVoice != null) {
+            // Strip language prefix if present (e.g., "en-us-af_heart" -> "af_heart")
+            if (reqVoice.contains("-")) {
+                reqVoice.substringAfterLast("-")
+            } else {
+                reqVoice
             }
-    
-            // Load Preferences
-            val prefs = applicationContext.getSharedPreferences("KokoroPrefs", Context.MODE_PRIVATE)
-            val prefVoice = prefs.getString("voice_skin", "af_heart") ?: "af_heart"
-            val prefSpeedMult = prefs.getFloat("speed_multiplier", 1.0f)
-    
-            stopRequested = false
+        } else {
+            prefVoice
+        }
+
+        // Determine language code from voice name prefix
+        val langCode = when {
+            voiceName.startsWith("af") || voiceName.startsWith("am") -> "en-us"
+            voiceName.startsWith("bf") || voiceName.startsWith("bm") -> "en-us"
+            voiceName.startsWith("ef") || voiceName.startsWith("em") -> "es"
+            voiceName.startsWith("ff") -> "fr"
+            voiceName.startsWith("hf") || voiceName.startsWith("hm") -> "hi"
+            voiceName.startsWith("if") || voiceName.startsWith("im") -> "it"
+            voiceName.startsWith("jf") || voiceName.startsWith("jm") -> "ja"
+            voiceName.startsWith("pf") || voiceName.startsWith("pm") -> "pt-br"
+            voiceName.startsWith("zf") -> "cmn"
+            else -> "en-us"
+        }
+
+        // Final safety check: if the voice doesn't look like a Kokoro voice, fallback to preference
+        if (!voiceName.contains("_")) {
+            voiceName = prefVoice
+        }
+
+        val speechRate = (req.speechRate.toFloat() / 100.0f) // Normalized rate
+        
+        // Debug: Log code points to see what is actually coming in
+        val debugPoints = text.take(50).codePoints().toArray().joinToString(" ") { "U+%04X".format(it) }
+        Log.i(TAG, "Input Text CodePoints: $debugPoints")
+
+        // Clean up text glitches
+        var cleanText = text
+            .replace("\u0393\u00C7\u00FF", "'") // ΓÇÿ -> '
+            .replace("\u0393\u00C7\u00D6", "'") // ΓÇÖ -> '
+            .replace("ΓÇÿ", "'")
+            .replace("ΓÇÖ", "'")
+            .replace("[\u2018\u2019\u201B]".toRegex(), "'") // Smart single quotes
+            .replace("[\u201C\u201D]".toRegex(), "\"") // Smart double quotes
+
+        Log.i(TAG, "Synthesizing text: \"$cleanText\" with voice: $voiceName, lang: $langCode, rate: $speechRate (PrefMult: $prefSpeedMult)")
+
+        // Use native 24kHz - no upsampling!
+        val playbackRate = 24000
+        callback.start(playbackRate, android.media.AudioFormat.ENCODING_PCM_16BIT, 1)
+
+        // Use cleaned text directly to preserve full prosody
+        val sentences = listOf(cleanText) 
+        
+        Log.i(TAG, "=== SPEED ADJUSTMENT ===")
+        val baseSpeed = req.speechRate.toFloat() / 100.0f
+        // Apply preference multiplier (default 1.0f)
+        val adjustedSpeed = baseSpeed * prefSpeedMult
+        Log.i(TAG, "System rate: ${req.speechRate}, Adjusted speed for Kokoro: $adjustedSpeed")
+
+        var success = false
+        for (sentence in sentences) {
+            if (stopRequested) break
             
-                    // Determine internal voice name and language code
-                    val reqVoice = req.voiceName
-                    var voiceName = if (reqVoice != null) {
-                        // Strip language prefix if present (e.g., "en-us-af_heart" -> "af_heart")
-                        if (reqVoice.contains("-")) {
-                            reqVoice.substringAfterLast("-")
-                        } else {
-                            reqVoice
-                        }
-                    } else {
-                        prefVoice
-                    }
-            
-                                                    // Determine language code from voice name prefix
-                                                    val langCode = when {
-                                                        voiceName.startsWith("af") || voiceName.startsWith("am") -> "en-us"
-                                                        voiceName.startsWith("bf") || voiceName.startsWith("bm") -> "en-us"
-                                                        voiceName.startsWith("ef") || voiceName.startsWith("em") -> "es"
-                                                        voiceName.startsWith("ff") -> "fr"
-                                                        voiceName.startsWith("hf") || voiceName.startsWith("hm") -> "hi"
-                                                        voiceName.startsWith("if") || voiceName.startsWith("im") -> "it"
-                                                        voiceName.startsWith("jf") || voiceName.startsWith("jm") -> "ja"
-                                                        voiceName.startsWith("pf") || voiceName.startsWith("pm") -> "pt-br"
-                                                        voiceName.startsWith("zf") -> "cmn"
-                                                        else -> "en-us"
-                                                    }
-                                            
-                                                                            // Final safety check: if the voice doesn't look like a Kokoro voice, fallback to preference
-                    if (!voiceName.contains("_")) {
-                        voiceName = prefVoice
-                    }
-            
-                    val speechRate = (req.speechRate.toFloat() / 100.0f) // Normalized rate
-                    
-                    // Debug: Log code points to see what is actually coming in
-                    val debugPoints = text.take(50).codePoints().toArray().joinToString(" ") { "U+%04X".format(it) }
-                    Log.i(TAG, "Input Text CodePoints: $debugPoints")
-            
-                    // Clean up text glitches
-                    var cleanText = text
-                        .replace("\u0393\u00C7\u00FF", "'") // ΓÇÿ -> '
-                        .replace("\u0393\u00C7\u00D6", "'") // ΓÇÖ -> '
-                        .replace("ΓÇÿ", "'")
-                        .replace("ΓÇÖ", "'")
-                        .replace("[\u2018\u2019\u201B]".toRegex(), "'") // Smart single quotes
-                        .replace("[\u201C\u201D]".toRegex(), "\"") // Smart double quotes
-            
-                    Log.i(TAG, "Synthesizing text: \"$cleanText\" with voice: $voiceName, lang: $langCode, rate: $speechRate (PrefMult: $prefSpeedMult)")
-            
-                    // Use native 24kHz - no upsampling!
-                    val playbackRate = 24000
-                    callback.start(playbackRate, android.media.AudioFormat.ENCODING_PCM_16BIT, 1)
-            
-                    // Use cleaned text directly to preserve full prosody
-                    val sentences = listOf(cleanText) 
-                    
-                    Log.i(TAG, "=== SPEED ADJUSTMENT ===")
-                    val baseSpeed = req.speechRate.toFloat() / 100.0f
-                    // Apply preference multiplier (default 1.0f)
-                    val adjustedSpeed = baseSpeed * prefSpeedMult
-                    Log.i(TAG, "System rate: ${req.speechRate}, Adjusted speed for Kokoro: $adjustedSpeed")
-            
-                    var success = false
-                    for (sentence in sentences) {
-                        if (stopRequested) break
-                        
-                        val floatSamples = synchronized(this) {
-                            if (stopRequested) return@synchronized null
-                            KokoroJNI.synthesize(sentence, voiceName, langCode, adjustedSpeed)
-                        }
-            
+            val floatSamples = synchronized(this) {
+                if (stopRequested) return@synchronized null
+                KokoroJNI.synthesize(sentence, voiceName, langCode, adjustedSpeed)
+            }
 
             if (floatSamples != null) {
                 success = true
@@ -324,7 +324,7 @@ class KokoroTTS : TextToSpeechService() {
                 val modelDir = File(filesDir, "model")
                 if (!modelDir.exists()) modelDir.mkdirs()
 
-                val modelFile = File(modelDir, MODEL_ONNX)
+                val modelFile = File(modelDir, "model.onnx")
                 val voicesFile = File(modelDir, VOICES_BIN)
                 
                 if (!modelFile.exists() || !voicesFile.exists()) {
@@ -347,7 +347,7 @@ class KokoroTTS : TextToSpeechService() {
                     val zipFile = File(filesDir, "espeak-ng-data.zip")
                     copyAssetFile(assetManager, "espeak-ng-data.zip", zipFile)
                     
-                    extractZip(zipFile, filesDir)
+                    extractZipFile(zipFile, filesDir)
                     zipFile.delete() // Clean up zip
                     Log.i(TAG, "Extracted espeak-ng-data successfully.")
                 }
@@ -370,7 +370,7 @@ class KokoroTTS : TextToSpeechService() {
         }
     }
 
-    private fun extractZip(zipFile: File, destDir: File) {
+    private fun extractZipFile(zipFile: File, destDir: File) {
         java.util.zip.ZipFile(zipFile).use { zip ->
             zip.entries().asSequence().forEach { entry ->
                 val outFile = File(destDir, entry.name)
@@ -389,7 +389,6 @@ class KokoroTTS : TextToSpeechService() {
     }
 
     companion object {
-        private const val MODEL_ONNX = "model.onnx"
         private const val VOICES_BIN = "voices.bin"
     }
 }
