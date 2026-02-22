@@ -116,12 +116,13 @@ fun SettingsScreen() {
                 val voicesFile = File(modelDir, "voices.bin")
                 val espeakDir = File(filesDir, "espeak-ng-data")
 
-                // URLs
                 val modelUrl = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx"
                 val voicesUrl = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
 
                 // 1. Download files if missing (Atomic download with .tmp)
-                if (!standardModel.exists()) {
+                // Skip if optimized model already exists
+                val optimizedModel = File(modelDir, "model.onnx.optimized")
+                if (!standardModel.exists() && !optimizedModel.exists()) {
                     val tmpFile = File(modelDir, "model.onnx.tmp")
                     downloadFile(modelUrl, tmpFile) { p ->
                         initStatus = "Downloading Model: $p%"

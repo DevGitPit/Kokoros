@@ -41,23 +41,32 @@ pub trait OrtBase {
             .with_execution_providers([ep::CPU::default().build()])
             .map_err(|e| format!("Failed to set CPU EP: {}", e))?;
 
-        let (final_path, opt_level) = if optimized_path.exists() && !is_stale {
+        let (final_path, opt_level, should_cleanup) = if optimized_path.exists() && !is_stale {
             log::info!("Loading pre-optimized model from: {}", optimized_path_str);
-            (optimized_path_str, ort::session::builder::GraphOptimizationLevel::Disable)
+            (optimized_path_str.clone(), ort::session::builder::GraphOptimizationLevel::Disable, false)
         } else {
             log::info!("Optimizing model and saving to: {}", optimized_path_str);
             builder = builder.with_optimized_model_path(&optimized_path_str)
                 .map_err(|e| format!("Failed to set optimized model path: {}", e))?;
-            (model_path, ort::session::builder::GraphOptimizationLevel::Level3)
+            (model_path.clone(), ort::session::builder::GraphOptimizationLevel::Level3, true)
         };
 
         let session = builder
             .with_optimization_level(opt_level)
             .map_err(|e| format!("Failed to set optimization level: {}", e))?
-            .commit_from_file(final_path)
+            .commit_from_file(&final_path)
             .map_err(|e| format!("Failed to commit from file: {}", e))?;
             
         self.set_sess(session);
+
+        if should_cleanup {
+            // Verify optimized file exists and is valid before deleting source
+            if optimized_path.exists() && optimized_path.metadata().map(|m| m.len()).unwrap_or(0) > 10_000_000 {
+                log::info!("Optimization successful. Deleting original model to save 326MB: {}", model_path);
+                let _ = std::fs::remove_file(model_path);
+            }
+        }
+
         Ok(())
     }
 

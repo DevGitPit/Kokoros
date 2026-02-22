@@ -325,9 +325,10 @@ class KokoroTTS : TextToSpeechService() {
                 if (!modelDir.exists()) modelDir.mkdirs()
 
                 val modelFile = File(modelDir, "model.onnx")
+                val optimizedModel = File(modelDir, "model.onnx.optimized")
                 val voicesFile = File(modelDir, VOICES_BIN)
                 
-                if (!modelFile.exists() || !voicesFile.exists()) {
+                if ((!modelFile.exists() && !optimizedModel.exists()) || !voicesFile.exists()) {
                     Log.e(TAG, "Model or voices missing. Please open the app and download them.")
                     return@withContext false
                 }
