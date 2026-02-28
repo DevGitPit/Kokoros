@@ -41,7 +41,7 @@ cargo clean -p ort-sys || true
 # We also link against standard Android libraries.
 export RUSTFLAGS="-L $ONNX_PATH -l onnxruntime -l log -l atomic -l c++_shared -C link-arg=-Wl,--export-dynamic"
 
-cargo build --release --target aarch64-linux-android --features xnnpack
+cargo build --release --target aarch64-linux-android
 
 # 5. Copy Output and Strip
 mkdir -p "$OUTPUT_DIR"

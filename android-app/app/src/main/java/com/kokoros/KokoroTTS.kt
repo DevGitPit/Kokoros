@@ -48,9 +48,8 @@ class KokoroTTS : TextToSpeechService() {
 
                 val prefs = applicationContext.getSharedPreferences("KokoroPrefs", Context.MODE_PRIVATE)
                 val ortThreads = prefs.getInt("ort_threads", 4)
-                val xnnpackThreads = prefs.getInt("xnnpack_threads", 1)
-                
-                ttsInitialized = KokoroJNI.initialize(modelPath!!, voicesPath!!, espeakParentPath, ortThreads, xnnpackThreads)
+
+                ttsInitialized = KokoroJNI.initialize(modelPath!!, voicesPath!!, espeakParentPath, ortThreads)
                 if (ttsInitialized) {
                     Log.i(TAG, "Kokoro TTS engine initialized successfully.")
                 } else {

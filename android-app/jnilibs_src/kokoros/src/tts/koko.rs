@@ -90,7 +90,6 @@ pub struct InitConfig {
     pub voices_url: String,
     pub sample_rate: u32,
     pub intra_threads: usize,
-    pub xnnpack_threads: usize,
 }
 
 impl Default for InitConfig {
@@ -100,7 +99,6 @@ impl Default for InitConfig {
             voices_url: "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin".into(),
             sample_rate: 24000,
             intra_threads: 0,
-            xnnpack_threads: 1,
         }
     }
 }
@@ -220,7 +218,7 @@ impl TTSKoko {
         }
 
         let model = Arc::new(Mutex::new(
-            ort_koko::OrtKoko::new(model_path.to_string(), cfg.intra_threads, cfg.xnnpack_threads)
+            ort_koko::OrtKoko::new(model_path.to_string(), cfg.intra_threads)
                 .expect("Failed to create Kokoro TTS model"),
         ));
         // TODO: if(not streaming) { model.print_info(); }
@@ -1234,7 +1232,7 @@ impl TTSKokoParallel {
                 num_instances
             );
             let model = Arc::new(Mutex::new(
-                ort_koko::OrtKoko::new(model_path.to_string(), cfg.intra_threads, cfg.xnnpack_threads)
+                ort_koko::OrtKoko::new(model_path.to_string(), cfg.intra_threads)
                     .expect("Failed to create Kokoro TTS model"),
             ));
             models.push(model);

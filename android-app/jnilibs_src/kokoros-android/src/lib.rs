@@ -20,7 +20,6 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_init(
     voices_path: JString,
     espeak_data_path: JString,
     intra_threads: jint,
-    xnnpack_threads: jint,
 ) -> jlong {
     android_logger::init_once(
         Config::default()
@@ -61,7 +60,6 @@ pub extern "system" fn Java_com_kokoros_KokoroJNI_init(
     let tts = rt.block_on(async {
         let config = InitConfig {
             intra_threads: intra_threads as usize,
-            xnnpack_threads: xnnpack_threads as usize,
             ..InitConfig::default()
         };
         TTSKoko::from_config(&model_path, &voices_path, config).await

@@ -27,4 +27,3 @@ ogg = "0.9"
 default = ["cpu"]
 cpu = []
 cuda = ["ort/cuda"]
-xnnpack = ["ort/xnnpack"]

@@ -91,7 +91,6 @@ fun SettingsScreen() {
         mutableIntStateOf(prefs.getInt("ort_threads", detectedPowerCores)) 
     }
     
-    var xnnpackThreads by remember { mutableIntStateOf(prefs.getInt("xnnpack_threads", 1)) }
     var isSynthesizing by remember { mutableStateOf(false) }
     var isEngineReady by remember { mutableStateOf(false) }
     var initStatus by remember { mutableStateOf("Checking assets...") }
@@ -155,8 +154,7 @@ fun SettingsScreen() {
                     modelFile.absolutePath, 
                     voicesFile.absolutePath, 
                     filesDir.absolutePath, 
-                    ortThreads,
-                    xnnpackThreads
+                    ortThreads
                 )
                 
                 if (success) {
@@ -175,12 +173,10 @@ fun SettingsScreen() {
     }
 
     // Helper to re-initialize engine
-    fun updateThreads(newOrt: Int, newXnn: Int) {
+    fun updateThreads(newOrt: Int) {
         ortThreads = newOrt
-        xnnpackThreads = newXnn
         prefs.edit()
             .putInt("ort_threads", newOrt)
-            .putInt("xnnpack_threads", newXnn)
             .apply()
         
         scope.launch {
@@ -198,8 +194,7 @@ fun SettingsScreen() {
                     modelFile.absolutePath, 
                     voicesFile.absolutePath, 
                     filesDir.absolutePath, 
-                    newOrt,
-                    newXnn
+                    newOrt
                 )
                 
                 if (success) {
@@ -330,7 +325,7 @@ fun SettingsScreen() {
                             DropdownMenuItem(
                                 text = { Text(if (count == 0) "0 (Auto)" else count.toString()) },
                                 onClick = {
-                                    if (count != ortThreads) updateThreads(count, xnnpackThreads)
+                                    if (count != ortThreads) updateThreads(count)
                                     ortExpanded = false
                                 }
                             )

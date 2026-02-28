@@ -27,7 +27,7 @@ object KokoroJNI {
      * @param intraThreads Number of threads for ONNX Runtime.
      * @return A pointer (long) to the native engine instance, or 0 if initialization fails.
      */
-    private external fun init(modelPath: String, voicesPath: String, espeakDataPath: String, intraThreads: Int, xnnpackThreads: Int): Long
+    private external fun init(modelPath: String, voicesPath: String, espeakDataPath: String, intraThreads: Int): Long
 
     /**
      * Synthesizes text to raw PCM audio samples.
@@ -46,7 +46,7 @@ object KokoroJNI {
     private external fun close(enginePtr: Long)
 
     /**
-     * Gets the current execution provider (e.g., "CPU", "XNNPACK").
+     * Gets the current execution provider (e.g., "CPU", "CUDA").
      * @param enginePtr The pointer to the native engine instance.
      * @return A string describing the backend.
      */
@@ -54,9 +54,9 @@ object KokoroJNI {
 
     // --- High-level Kotlin API ---
 
-    fun initialize(modelPath: String, voicesPath: String, espeakDataPath: String, intraThreads: Int, xnnpackThreads: Int): Boolean {
+    fun initialize(modelPath: String, voicesPath: String, espeakDataPath: String, intraThreads: Int): Boolean {
         if (enginePtr == 0L) {
-            enginePtr = init(modelPath, voicesPath, espeakDataPath, intraThreads, xnnpackThreads)
+            enginePtr = init(modelPath, voicesPath, espeakDataPath, intraThreads)
         }
         return enginePtr != 0L
     }
