@@ -10,8 +10,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +20,8 @@ import kotlin.math.roundToInt
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -78,7 +78,7 @@ fun SettingsScreen() {
     var selectedVoice by remember { mutableStateOf(prefs.getString("voice_skin", "af_heart") ?: "af_heart") }
     
     // Determine initial language from selected voice
-    val initialLanguage = remember {
+    val initialLanguage = remember(selectedVoice) {
         languageGroups.find { it.second.contains(selectedVoice) }?.first ?: "US English"
     }
     var selectedLanguage by remember { mutableStateOf(initialLanguage) }
@@ -108,7 +108,7 @@ fun SettingsScreen() {
         val isFirstLaunch = !prefs.contains("ort_threads")
         if (isFirstLaunch) {
             Toast.makeText(context, "Auto-detected $detectedPowerCores power cores for optimal performance", Toast.LENGTH_LONG).show()
-            prefs.edit().putInt("ort_threads", detectedPowerCores).apply()
+            prefs.edit().putInt("ort_threads", detectedPowerCores).commit()
         }
 
         withContext(Dispatchers.IO) {
@@ -177,7 +177,7 @@ fun SettingsScreen() {
         ortThreads = newOrt
         prefs.edit()
             .putInt("ort_threads", newOrt)
-            .apply()
+            .commit()
         
         scope.launch {
             withContext(Dispatchers.IO) {
@@ -210,7 +210,8 @@ fun SettingsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
@@ -238,7 +239,7 @@ fun SettingsScreen() {
                         if (!newVoices.contains(selectedVoice)) {
                             val firstVoice = newVoices.firstOrNull() ?: "af_heart"
                             selectedVoice = firstVoice
-                            prefs.edit().putString("voice_skin", firstVoice).apply()
+                            prefs.edit().putString("voice_skin", firstVoice).commit()
                         }
                     }
                 ) {
@@ -250,7 +251,7 @@ fun SettingsScreen() {
                             if (!newVoices.contains(selectedVoice)) {
                                 val firstVoice = newVoices.firstOrNull() ?: "af_heart"
                                 selectedVoice = firstVoice
-                                prefs.edit().putString("voice_skin", firstVoice).apply()
+                                prefs.edit().putString("voice_skin", firstVoice).commit()
                             }
                         }
                     )
@@ -295,12 +296,31 @@ fun SettingsScreen() {
                         onClick = {
                             selectedVoice = voice
                             expanded = false
-                            prefs.edit().putString("voice_skin", voice).apply()
+                            prefs.edit().putString("voice_skin", voice).commit()
                         }
                     )
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- Speed Multiplier Slider ---
+        Text(text = "Speed Multiplier: ${String.format("%.2f", speedMultiplier)}x", style = MaterialTheme.typography.titleMedium)
+        Slider(
+            value = speedMultiplier,
+            onValueChange = { speedMultiplier = it },
+            onValueChangeFinished = {
+                prefs.edit().putFloat("speed_multiplier", speedMultiplier).commit()
+            },
+            valueRange = 0.5f..2.5f,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Text(
+            text = "Fine-tune the speech rate. System rate will also be applied.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -349,7 +369,7 @@ fun SettingsScreen() {
                     scope.launch {
                         isSynthesizing = true
                         try {
-                            playSample(context, selectedVoice, selectedLanguage, 1.0f)
+                            playSample(context, selectedVoice, selectedLanguage, speedMultiplier)
                         } catch (e: Exception) {
                             Toast.makeText(context, "Playback failed: ${e.message}", Toast.LENGTH_SHORT).show()
                         } finally {
@@ -381,6 +401,7 @@ fun SettingsScreen() {
                 Text("Play Sample Audio")
             }
         }
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
@@ -414,7 +435,7 @@ private suspend fun playSample(context: Context, voice: String, language: String
     val text = when (language) {
         "Spanish" -> "Esta es una muestra del motor de texto a voz de Kokoro en español."
         "French" -> "Ceci est un échantillon du moteur de synthèse vocale Kokoro en français."
-        "Hindi" -> "यह हिंदी में कोकोरो टेक्स्ट टू स्पीच इंजन का एक नमूना है।"
+        "Hindi" -> "यह हिंदी में कोकोरो टेक्स्ट टू स्पीच इंजन का एक नमू向です。"
         "Italian" -> "Questo è un esempio del motore di sintesi vocale Kokoro in italiano."
         // Use Kana only for Japanese as eSpeak-ng struggles with Kanji Kanji Kanji
         "Japanese" -> "これは、ココログルー、テキストよみあげエンジンのサンプルです。" 
@@ -432,6 +453,8 @@ private suspend fun playSample(context: Context, voice: String, language: String
         "Japanese" -> "ja"
         "Brazilian Portuguese" -> "pt-br"
         "Mandarin Chinese" -> "cmn"
+        // British voices use en-us phonemizer as a workaround for unstable en-gb;
+        // Rust engine handles accent tweaks for bf/bm voices automatically.
         "UK English" -> "en-us"
         else -> "en-us"
     }

@@ -109,6 +109,42 @@ class KokoroTTS : TextToSpeechService() {
 
         override fun onGetDefaultVoiceNameFor(lang: String?, country: String?, variant: String?): String {
             val language = lang?.lowercase(Locale.ROOT) ?: "en"
+            
+            // Try to use the user's preferred voice if it matches the language
+            val prefs = applicationContext.getSharedPreferences("KokoroPrefs", Context.MODE_PRIVATE)
+            val prefVoice = prefs.getString("voice_skin", "af_heart") ?: "af_heart"
+            
+            // Check if prefVoice matches the requested language
+            val isMatch = when {
+                language.startsWith("es") -> prefVoice.startsWith("ef") || prefVoice.startsWith("em")
+                language.startsWith("fr") -> prefVoice.startsWith("ff")
+                language.startsWith("hi") -> prefVoice.startsWith("hf") || prefVoice.startsWith("hm")
+                language.startsWith("it") -> prefVoice.startsWith("if") || prefVoice.startsWith("im")
+                language.startsWith("ja") -> prefVoice.startsWith("jf") || prefVoice.startsWith("jm")
+                language.startsWith("pt") -> prefVoice.startsWith("pf") || prefVoice.startsWith("pm")
+                language.startsWith("zh") -> prefVoice.startsWith("zf")
+                language.startsWith("en") -> prefVoice.startsWith("af") || prefVoice.startsWith("am") || prefVoice.startsWith("bf") || prefVoice.startsWith("bm")
+                else -> false
+            }
+
+            if (isMatch) {
+                // Determine language tag for the system name
+                val langTag = when {
+                    prefVoice.startsWith("af") || prefVoice.startsWith("am") -> "en-us"
+                    prefVoice.startsWith("bf") || prefVoice.startsWith("bm") -> "en-gb"
+                    prefVoice.startsWith("ef") || prefVoice.startsWith("em") -> "es-es"
+                    prefVoice.startsWith("ff") -> "fr-fr"
+                    prefVoice.startsWith("hf") || prefVoice.startsWith("hm") -> "hi-in"
+                    prefVoice.startsWith("if") || prefVoice.startsWith("im") -> "it-it"
+                    prefVoice.startsWith("jf") || prefVoice.startsWith("jm") -> "ja-jp"
+                    prefVoice.startsWith("pf") || prefVoice.startsWith("pm") -> "pt-br"
+                    prefVoice.startsWith("zf") -> "zh-cn"
+                    else -> "en-us"
+                }
+                return "$langTag-$prefVoice"
+            }
+
+            // Fallback hardcoded defaults
             return when {
                 language.startsWith("es") -> "es-es-ef_dora"
                 language.startsWith("fr") -> "fr-fr-ff_siwis"
@@ -213,10 +249,13 @@ class KokoroTTS : TextToSpeechService() {
                     }
             
                                                     // Determine language code from voice name prefix
-                                                    val langCode = when {
-                                                        voiceName.startsWith("af") || voiceName.startsWith("am") -> "en-us"
-                                                        voiceName.startsWith("bf") || voiceName.startsWith("bm") -> "en-us"
-                                                        voiceName.startsWith("ef") || voiceName.startsWith("em") -> "es"
+                    // Note: British voices (bf/bm) use en-us phonemizer as a workaround
+                    // for unstable en-gb phonemizer; Rust engine handles the accent tweaks.
+                    val langCode = when {
+                        voiceName.startsWith("af") || voiceName.startsWith("am") -> "en-us"
+                        voiceName.startsWith("bf") || voiceName.startsWith("bm") -> "en-us"
+                        voiceName.startsWith("ef") || voiceName.startsWith("em") -> "es"
+
                                                         voiceName.startsWith("ff") -> "fr"
                                                         voiceName.startsWith("hf") || voiceName.startsWith("hm") -> "hi"
                                                         voiceName.startsWith("if") || voiceName.startsWith("im") -> "it"
