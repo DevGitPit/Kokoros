@@ -99,7 +99,7 @@ impl Default for InitConfig {
             model_url: "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx".into(),
             voices_url: "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin".into(),
             sample_rate: 24000,
-            intra_threads: 4,
+            intra_threads: 0,
             xnnpack_threads: 1,
         }
     }

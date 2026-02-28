@@ -84,13 +84,19 @@ fun SettingsScreen() {
     var selectedLanguage by remember { mutableStateOf(initialLanguage) }
     
     var speedMultiplier by remember { mutableFloatStateOf(prefs.getFloat("speed_multiplier", 1.0f)) }
-    var ortThreads by remember { mutableIntStateOf(prefs.getInt("ort_threads", 4)) }
+    
+    // Auto-detect optimal threads on first launch
+    val detectedPowerCores = remember { CpuCoreHelper.getPowerCoreCount() }
+    var ortThreads by remember { 
+        mutableIntStateOf(prefs.getInt("ort_threads", detectedPowerCores)) 
+    }
+    
     var xnnpackThreads by remember { mutableIntStateOf(prefs.getInt("xnnpack_threads", 1)) }
     var isSynthesizing by remember { mutableStateOf(false) }
     var isEngineReady by remember { mutableStateOf(false) }
     var initStatus by remember { mutableStateOf("Checking assets...") }
 
-    val threadOptions = listOf(1, 2, 3, 4, 5, 6, 8)
+    val threadOptions = listOf(0, 1, 2, 3, 4, 5, 6, 8)
 
     // Filtered voices based on selected language
     val filteredVoices = remember(selectedLanguage) {
@@ -99,6 +105,13 @@ fun SettingsScreen() {
 
     // Startup Initialization
     LaunchedEffect(Unit) {
+        // Show auto-detection toast on first launch
+        val isFirstLaunch = !prefs.contains("ort_threads")
+        if (isFirstLaunch) {
+            Toast.makeText(context, "Auto-detected $detectedPowerCores power cores for optimal performance", Toast.LENGTH_LONG).show()
+            prefs.edit().putInt("ort_threads", detectedPowerCores).apply()
+        }
+
         withContext(Dispatchers.IO) {
             try {
                 val filesDir = context.filesDir
@@ -305,7 +318,7 @@ fun SettingsScreen() {
                 var ortExpanded by remember { mutableStateOf(false) }
                 Box {
                     OutlinedTextField(
-                        value = ortThreads.toString(),
+                        value = if (ortThreads == 0) "0 (Auto)" else ortThreads.toString(),
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = ortExpanded) },
@@ -315,7 +328,7 @@ fun SettingsScreen() {
                     DropdownMenu(expanded = ortExpanded, onDismissRequest = { ortExpanded = false }) {
                         threadOptions.forEach { count ->
                             DropdownMenuItem(
-                                text = { Text(count.toString()) },
+                                text = { Text(if (count == 0) "0 (Auto)" else count.toString()) },
                                 onClick = {
                                     if (count != ortThreads) updateThreads(count, xnnpackThreads)
                                     ortExpanded = false
@@ -327,7 +340,7 @@ fun SettingsScreen() {
             }
         }
         Text(
-            text = "Recommended: 4 threads for most modern octa-core devices.",
+            text = "0 uses all cores. Recommended: $detectedPowerCores power cores for this device.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

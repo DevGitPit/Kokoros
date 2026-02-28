@@ -4,12 +4,7 @@ use ort::session::Session;
 use ort::session::builder::SessionBuilder;
 
 pub trait OrtBase {
-    fn load_model(&mut self, model_path: String, mut intra_threads: usize, _xnnpack_threads: usize) -> Result<(), String> {
-        // Default to 4 threads if 0 is provided, typical for mobile Big cores.
-        if intra_threads == 0 {
-            intra_threads = 4;
-        }
-
+    fn load_model(&mut self, model_path: String, intra_threads: usize, _xnnpack_threads: usize) -> Result<(), String> {
         let builder = SessionBuilder::new()
             .map_err(|e| format!("Failed to create session builder: {}", e))?
             .with_optimization_level(ort::session::builder::GraphOptimizationLevel::Level3)
